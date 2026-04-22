@@ -100,6 +100,7 @@ Tous les value objects sont types, valides a la creation et immutables.
 - `BranchUnlockPolicy`: regles de debloquage branches de competences
 - `WarehouseUnlockPolicy`: regles de passage entre entrepots
 - `HiddenBranchPolicy`: regles de debloquage branche cachee
+  - v1: branche cachee unlock uniquement quand les 7 branches principales sont au niveau max (35/35)
 
 ## Hard Errors vs Recoverable Errors
 

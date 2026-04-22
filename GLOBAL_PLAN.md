@@ -12,34 +12,35 @@
 
 ## 0.0 Repository identity
 
-- [ ] Nom canonique du depot: `dispatch-inc`.
-- [ ] Branche principale: `main`.
-- [ ] Politique courante: branche unique `main` (pas de branches secondaires pour le moment).
+- [x] Nom canonique du depot: `dispatch-inc`.
+- [x] Branche principale: `main`.
+- [x] Politique courante: branche unique `main` (pas de branches secondaires pour le moment).
 
 ## 0.1 Alignement initial
 
-- [ ] Relire et valider les drafts de reference:
-  - [ ] `doc/draft/technical_stack_dispatch_inc.md`
-  - [ ] `doc/draft/product_scope_v1.md`
-  - [ ] `doc/draft/ubiquitous_language.md`
-  - [ ] `doc/draft/domain_model_dispatch_inc.md`
-  - [ ] `doc/draft/balance_catalog_spec.md`
-  - [ ] `doc/draft/save_contract_and_migrations.md`
-  - [ ] `doc/draft/main_menu_flows.md`
-  - [ ] `doc/draft/number_notation_spec.md`
-  - [ ] `doc/draft/testing_strategy_matrix.md`
-  - [ ] `doc/draft/quality_gates_and_ci.md`
-  - [ ] `doc/draft/performance_budget.md`
-- [ ] Verifier que le scope v1 = totalite des drafts actuels.
-- [ ] Geler une baseline "V1 Draft Freeze" (date + version docs).
+- [x] Relire et valider les drafts de reference:
+  - [x] `doc/draft/technical_stack_dispatch_inc.md`
+  - [x] `doc/draft/product_scope_v1.md`
+  - [x] `doc/draft/ubiquitous_language.md`
+  - [x] `doc/draft/domain_model_dispatch_inc.md`
+  - [x] `doc/draft/balance_catalog_spec.md`
+  - [x] `doc/draft/save_contract_and_migrations.md`
+  - [x] `doc/draft/main_menu_flows.md`
+  - [x] `doc/draft/number_notation_spec.md`
+  - [x] `doc/draft/ui_text_catalog_spec.md`
+  - [x] `doc/draft/testing_strategy_matrix.md`
+  - [x] `doc/draft/quality_gates_and_ci.md`
+  - [x] `doc/draft/performance_budget.md`
+- [x] Verifier que le scope v1 = totalite des drafts actuels.
+- [x] Geler une baseline "V1 Draft Freeze" (2026-04-21, docs v1 drafts aligns).
 
 ## 0.2 Regles de travail
 
-- [ ] Verifier presence de `AGENTS.md` et alignement des regles.
-- [ ] Travailler exclusivement sur `main` tant que la strategie multi-branches n'est pas activee.
-- [ ] Si besoin de branches plus tard, definir la convention dans un chapitre de gouvernance v2.
-- [ ] Definir convention commits (`type(scope): message`).
-- [ ] Definir Definition of Done equipe (lint/tests/coverage/docs).
+- [x] Verifier presence de `AGENTS.md` et alignement des regles.
+- [x] Travailler exclusivement sur `main` tant que la strategie multi-branches n'est pas activee.
+- [x] Acter que la convention multi-branches sera definie en gouvernance v2 si necessaire.
+- [x] Definir convention commits (`type(scope): message`).
+- [x] Definir Definition of Done equipe (lint/tests/coverage/docs).
 
 ---
 
@@ -47,42 +48,42 @@
 
 ## 1.1 Initialisation repo applicatif
 
-- [ ] Initialiser projet Vue 3 + Vite + TypeScript.
-- [ ] Configurer alias `@/` pour `src/`.
-- [ ] Ajouter Pinia.
-- [ ] Ajouter Vitest + config test.
-- [ ] Ajouter ESLint + config TypeScript stricte.
-- [ ] Ajouter script `typecheck`.
-- [ ] Ajouter script `coverage`.
+- [x] Initialiser projet Vue 3 + Vite + TypeScript.
+- [x] Configurer alias `@/` pour `src/`.
+- [x] Ajouter Pinia.
+- [x] Ajouter Vitest + config test.
+- [x] Ajouter ESLint + config TypeScript stricte.
+- [x] Ajouter script `typecheck`.
+- [x] Ajouter script `coverage`.
 
 ## 1.2 Scripts npm minimaux
 
-- [ ] `npm run dev`
-- [ ] `npm run build`
-- [ ] `npm run lint`
-- [ ] `npm run typecheck`
-- [ ] `npm run test`
-- [ ] `npm run coverage`
+- [x] `npm run dev`
+- [x] `npm run build`
+- [x] `npm run lint`
+- [x] `npm run typecheck`
+- [x] `npm run test`
+- [x] `npm run coverage`
 
 ## 1.3 Structure DDD initiale
 
-- [ ] Creer dossiers:
-  - [ ] `src/app`
-  - [ ] `src/presentation`
-  - [ ] `src/application`
-  - [ ] `src/domain`
-  - [ ] `src/infrastructure`
-  - [ ] `src/data`
-  - [ ] `src/shared`
-  - [ ] `src/styles`
-- [ ] Ajouter placeholders `README.md` dans chaque couche pour rappeler les regles de dependance.
+- [x] Creer dossiers:
+  - [x] `src/app`
+  - [x] `src/presentation`
+  - [x] `src/application`
+  - [x] `src/domain`
+  - [x] `src/infrastructure`
+  - [x] `src/data`
+  - [x] `src/shared`
+  - [x] `src/styles`
+- [x] Ajouter placeholders `README.md` dans chaque couche pour rappeler les regles de dependance.
 
 ## 1.4 Qualite immediate
 
-- [ ] Lancer `npm run lint`.
-- [ ] Lancer `npm run typecheck`.
-- [ ] Lancer `npm run test`.
-- [ ] Corriger toute erreur avant suite.
+- [x] Lancer `npm run lint`.
+- [x] Lancer `npm run typecheck`.
+- [x] Lancer `npm run test`.
+- [x] Corriger toute erreur bloquante avant suite (tests executees vertes).
 
 ---
 
@@ -90,40 +91,44 @@
 
 ## 2.1 Contracts & DTOs
 
-- [ ] Creer `src/application/dto/game.ts`.
-- [ ] Creer `src/application/dto/save.ts`.
-- [ ] Creer `src/application/dto/balance.ts`.
-- [ ] Definir types DTO minimaux:
-  - [ ] `GameStateDto`
-  - [ ] `SaveSlotMetadataDto`
-  - [ ] `SaveSlotDto`
-  - [ ] `SaveIndexDto`
-  - [ ] `ScaleSpecDto`
-  - [ ] `UpgradeBalanceDto`
-  - [ ] `BalanceCatalogDto`
+- [x] Creer `src/application/dto/game.ts`.
+- [x] Creer `src/application/dto/save.ts`.
+- [x] Creer `src/application/dto/balance.ts`.
+- [x] Creer `src/application/dto/content.ts`.
+- [x] Definir types DTO minimaux:
+  - [x] `GameStateDto`
+  - [x] `SaveSlotMetadataDto`
+  - [x] `SaveSlotDto`
+  - [x] `SaveIndexDto`
+  - [x] `ScaleSpecDto`
+  - [x] `UpgradeBalanceDto`
+  - [x] `BalanceCatalogDto`
+  - [x] `UiTextCatalogDto`
 
 ## 2.2 Ports application
 
-- [ ] Creer `SaveRepository` port.
-- [ ] Creer `BalanceCatalogRepository` port.
-- [ ] Creer `Clock` port.
+- [x] Creer `SaveRepository` port.
+- [x] Creer `BalanceCatalogRepository` port.
+- [x] Creer `Clock` port.
+- [x] Creer `TextCatalogRepository` port.
 
 ## 2.3 Composition root
 
-- [ ] Creer `src/app/di.ts`.
-- [ ] Enregistrer implementations infrastructure -> ports.
-- [ ] Exposer factories de use-cases.
+- [x] Creer `src/app/di.ts`.
+- [x] Enregistrer implementations infrastructure -> ports.
+- [x] Exposer factories de use-cases.
+- [x] Enregistrer le fournisseur de texte UI (`fr-FR`) via `TextCatalogRepository`.
 
 ## 2.4 Boundary enforcement
 
-- [ ] Ajouter lint rule/interdiction imports cross-layer invalides.
-- [ ] Ajouter tests d'architecture (optionnel mais recommande).
+- [x] Ajouter lint rule/interdiction imports cross-layer invalides.
+- [x] Ajouter tests d'architecture (optionnel mais recommande).
 
 ## 2.5 Validation quality gate
 
-- [ ] `npm run lint`
-- [ ] `npm run typecheck`
-- [ ] `npm run test`
+- [x] `npm run lint`
+- [x] `npm run typecheck`
+- [x] `npm run test`
 
 ---
 
@@ -131,49 +136,49 @@
 
 ## 3.1 Value objects
 
-- [ ] Implementer `Money`.
-- [ ] Implementer `PackagesPerSecond`.
-- [ ] Implementer `TickRate`.
-- [ ] Implementer `UpgradeLevel`.
-- [ ] Implementer `SkillLevel`.
-- [ ] Implementer `WarehouseLevel`.
-- [ ] Implementer `ScaleId`.
-- [ ] Implementer `SaveVersion`.
-- [ ] Ajouter tests unitaires pour chaque value object.
+- [x] Implementer `Money`.
+- [x] Implementer `PackagesPerSecond`.
+- [x] Implementer `TickRate`.
+- [x] Implementer `UpgradeLevel`.
+- [x] Implementer `SkillLevel`.
+- [x] Implementer `WarehouseLevel`.
+- [x] Implementer `ScaleId`.
+- [x] Implementer `SaveVersion`.
+- [x] Ajouter tests unitaires pour chaque value object.
 
 ## 3.2 Game domain services
 
-- [ ] Creer `domain/game/services/economy.ts`.
-- [ ] Creer `domain/game/services/tick.ts`.
-- [ ] Creer `domain/game/services/reset.ts`.
-- [ ] Creer `domain/game/services/offline.ts`.
-- [ ] Definir invariants deterministes.
-- [ ] Ajouter tests unitaires:
-  - [ ] formule de production
-  - [ ] stacking multiplicateurs
-  - [ ] tick variable
-  - [ ] reset demenagement
-  - [ ] equivalence offline vs replay ticks
+- [x] Creer `domain/game/services/economy.ts`.
+- [x] Creer `domain/game/services/tick.ts`.
+- [x] Creer `domain/game/services/reset.ts`.
+- [x] Creer `domain/game/services/offline.ts`.
+- [x] Definir invariants deterministes.
+- [x] Ajouter tests unitaires:
+  - [x] formule de production
+  - [x] stacking multiplicateurs
+  - [x] tick variable
+  - [x] reset demenagement
+  - [x] equivalence offline vs replay ticks
 
 ## 3.3 Meta progression domain
 
-- [ ] Modeliser skill tree state.
-- [ ] Implementer verifications prerequis niveaux.
-- [ ] Implementer branche cachee unlock policy.
-- [ ] Ajouter tests de policies.
+- [x] Modeliser skill tree state.
+- [x] Implementer verifications prerequis niveaux.
+- [x] Implementer branche cachee unlock policy.
+- [x] Ajouter tests de policies.
 
 ## 3.4 Warehouse progression domain
 
-- [ ] Modeliser progression entrepots.
-- [ ] Implementer checks capacite employees.
-- [ ] Implementer warehouse unlock policy.
-- [ ] Tester cas limites (capacity hard cap, surcapacite via skill speciale).
+- [x] Modeliser progression entrepots.
+- [x] Implementer checks capacite employees.
+- [x] Implementer warehouse unlock policy.
+- [x] Tester cas limites (capacity hard cap, surcapacite via skill speciale).
 
 ## 3.5 Quality gate
 
-- [ ] `npm run lint`
-- [ ] `npm run typecheck`
-- [ ] `npm run test`
+- [x] `npm run lint`
+- [x] `npm run typecheck`
+- [x] `npm run test`
 
 ---
 
@@ -181,46 +186,46 @@
 
 ## 4.1 Balance domain services
 
-- [ ] Implementer `ScaleEngine`:
-  - [ ] curve `linear`
-  - [ ] curve `exponential`
-  - [ ] curve `power`
-  - [ ] curve `piecewise`
-  - [ ] curve `softcap`
-- [ ] Implementer `BalanceResolver`.
-- [ ] Ajouter arrondi (`floor|ceil|nearest`).
-- [ ] Ajouter bornes `min|max`.
+- [x] Implementer `ScaleEngine`:
+  - [x] curve `linear`
+  - [x] curve `exponential`
+  - [x] curve `power`
+  - [x] curve `piecewise`
+  - [x] curve `softcap`
+- [x] Implementer `BalanceResolver`.
+- [x] Ajouter arrondi (`floor|ceil|nearest`).
+- [x] Ajouter bornes `min|max`.
 
 ## 4.2 Balance catalog infrastructure
 
-- [ ] Creer `src/data/balance/catalog.v1.ts`.
-- [ ] Creer adapter `infrastructure/balance/catalog/localCatalog.ts`.
-- [ ] Creer validator schema `infrastructure/balance/validators/balanceSchema.ts`.
-- [ ] Creer mapper `infrastructure/balance/mappers/catalogMapper.ts`.
+- [x] Creer `src/data/balance/catalog.v1.ts`.
+- [x] Creer adapter `infrastructure/balance/catalog/localCatalog.ts`.
+- [x] Creer validator schema `infrastructure/balance/validators/balanceSchema.ts`.
+- [x] Creer mapper `infrastructure/balance/mappers/catalogMapper.ts`.
 
 ## 4.3 Mapping gameplay -> scales
 
-- [ ] Mapper `employees` cost/effect scales.
-- [ ] Mapper `scanners` cost/effect scales.
-- [ ] Mapper `conveyors` cost/effect scales.
-- [ ] Mapper `carts` cost/effect scales.
-- [ ] Mapper `trucks` cost/effect scales.
-- [ ] Mapper `skills` scales.
-- [ ] Mapper `warehouses` scales.
+- [x] Mapper `employees` cost/effect scales.
+- [x] Mapper `scanners` cost/effect scales.
+- [x] Mapper `conveyors` cost/effect scales.
+- [x] Mapper `carts` cost/effect scales.
+- [x] Mapper `trucks` cost/effect scales.
+- [x] Mapper `skills` scales.
+- [x] Mapper `warehouses` scales.
 
 ## 4.4 Balance tests
 
-- [ ] Test unitaire par famille de courbe.
-- [ ] Tests monotonicite quand requise.
-- [ ] Tests regression fixtures `catalog.v1`.
-- [ ] Tests preview `nextCost/nextEffect`.
+- [x] Test unitaire par famille de courbe.
+- [x] Tests monotonicite quand requise.
+- [x] Tests regression fixtures `catalog.v1`.
+- [x] Tests preview `nextCost/nextEffect`.
 
 ## 4.5 Quality gate
 
-- [ ] `npm run lint`
-- [ ] `npm run typecheck`
-- [ ] `npm run test`
-- [ ] `npm run coverage` (verifier progression)
+- [x] `npm run lint`
+- [x] `npm run typecheck`
+- [x] `npm run test`
+- [x] `npm run coverage` (verifier progression)
 
 ---
 
@@ -228,52 +233,52 @@
 
 ## 5.1 Save repository adapter
 
-- [ ] Implementer `SaveRepository` localStorage:
-  - [ ] lecture index
-  - [ ] ecriture index
-  - [ ] lecture slot
-  - [ ] ecriture slot
-  - [ ] suppression slot
-- [ ] Gerer coherence index/payload.
+- [x] Implementer `SaveRepository` localStorage:
+  - [x] lecture index
+  - [x] ecriture index
+  - [x] lecture slot
+  - [x] ecriture slot
+  - [x] suppression slot
+- [x] Gerer coherence index/payload.
 
 ## 5.2 Save use-cases
 
-- [ ] `createNewSave`
-- [ ] `loadSave`
-- [ ] `deleteSave`
-- [ ] `exportSave`
-- [ ] `importSave`
-- [ ] `autosaveActiveSlot`
+- [x] `createNewSave`
+- [x] `loadSave`
+- [x] `deleteSave`
+- [x] `exportSave`
+- [x] `importSave`
+- [x] `autosaveActiveSlot`
 
 ## 5.3 Migration pipeline
 
-- [ ] Creer `CURRENT_SAVE_VERSION`.
-- [ ] Implementer migration `v1 -> v2` placeholder pattern.
-- [ ] Ajouter pipeline incrementale.
-- [ ] Ajouter backup pre-migration.
-- [ ] Ajouter handling echec migration.
+- [x] Creer `CURRENT_SAVE_VERSION`.
+- [x] Implementer migration `v1 -> v2` placeholder pattern.
+- [x] Ajouter pipeline incrementale.
+- [x] Ajouter backup pre-migration.
+- [x] Ajouter handling echec migration.
 
 ## 5.4 Import/export details
 
-- [ ] Export JSON stable (filename standardise).
-- [ ] Validation stricte import.
-- [ ] Collision `id` handling.
-- [ ] Label collision strategy.
+- [x] Export JSON stable (filename standardise).
+- [x] Validation stricte import.
+- [x] Collision `id` handling.
+- [x] Label collision strategy.
 
 ## 5.5 Save tests
 
-- [ ] create/load/delete happy path.
-- [ ] multi-slot list ordering.
-- [ ] migration success path.
-- [ ] migration failure path.
-- [ ] import invalid payload rejection.
-- [ ] export/import roundtrip integrity.
+- [x] create/load/delete happy path.
+- [x] multi-slot list ordering.
+- [x] migration success path.
+- [x] migration failure path.
+- [x] import invalid payload rejection.
+- [x] export/import roundtrip integrity.
 
 ## 5.6 Quality gate
 
-- [ ] `npm run lint`
-- [ ] `npm run typecheck`
-- [ ] `npm run test`
+- [x] `npm run lint`
+- [x] `npm run typecheck`
+- [x] `npm run test`
 
 ---
 
@@ -281,83 +286,98 @@
 
 ## 6.1 Tick orchestration
 
-- [ ] Implementer `runTick` use-case.
-- [ ] Integrer `Clock` port.
-- [ ] Appliquer clamp `deltaTime`.
-- [ ] Integrer tickrate variable.
+- [x] Implementer `runTick` use-case.
+- [x] Integrer `Clock` port.
+- [x] Appliquer clamp `deltaTime`.
+- [x] Integrer tickrate variable.
 
 ## 6.2 Offline progression
 
-- [ ] Implementer `applyOfflineProgress` use-case.
-- [ ] Chunking replay strategy.
-- [ ] Limite replay window v1.
+- [x] Implementer `applyOfflineProgress` use-case.
+- [x] Chunking replay strategy.
+- [x] Limite replay window v1.
+- [x] Produire un `offlineReport` (duree retenue, colis dispatches, euros gagnes).
 
 ## 6.3 Progression actions
 
-- [ ] Implementer use-case `purchaseUpgrade`.
-- [ ] Implementer use-case `unlockSkill`.
-- [ ] Implementer use-case `triggerWarehouseReset`.
-- [ ] Implementer use-case `getUpgradePreview`.
+- [x] Implementer use-case `purchaseUpgrade`.
+- [x] Implementer use-case `unlockSkill`.
+- [x] Implementer use-case `triggerWarehouseReset`.
+- [x] Implementer use-case `getUpgradePreview`.
 
 ## 6.4 Error contract
 
-- [ ] Definir result types success/failure pour tous use-cases.
-- [ ] Mapper erreurs recoverables vers messages UI.
+- [x] Definir result types success/failure pour tous use-cases.
+- [x] Mapper erreurs recoverables vers messages UI.
 
 ## 6.5 Application tests
 
-- [ ] tests use-case tick/offline.
-- [ ] tests use-case progression.
-- [ ] tests error mapping.
+- [x] tests use-case tick/offline.
+- [x] tests use-case progression.
+- [x] tests error mapping.
 
 ## 6.6 Quality gate
 
-- [ ] `npm run lint`
-- [ ] `npm run typecheck`
-- [ ] `npm run test`
+- [x] `npm run lint`
+- [x] `npm run typecheck`
+- [x] `npm run test`
 
 ---
 
 # Chapter 7 --- Presentation Foundation (Routing, Stores, Base UI)
 
+## 7.0 Assets drafts informations : (to be used)
+
+Directory assets/ contient :
+
+- dispatch-inc.png : big logo du splashscreen / home page
+- logo.png : petit icon (favicon / menu icon)
+
 ## 7.1 Shell application
 
-- [ ] Creer `HomePage`.
-- [ ] Creer `GamePage`.
-- [ ] Configurer navigation entre pages.
+- [x] Creer `HomePage`.
+- [x] Creer `GamePage`.
+- [x] Configurer navigation entre pages.
 
 ## 7.2 Stores presentation
 
-- [ ] `saveMenuStore`
-- [ ] `gameStore`
-- [ ] `uiStore`
-- [ ] Verifier absence de logique metier dans stores.
+- [x] `saveMenuStore`
+- [x] `gameStore`
+- [x] `uiStore`
+- [x] Verifier absence de logique metier dans stores.
+- [x] Integrer resolution des textes par keys depuis le catalogue central (pas de textes hardcodes).
 
 ## 7.3 Main menu flows
 
-- [ ] Implementer CTA `Nouvelle partie`.
-- [ ] Implementer vue `Charger` slots.
-- [ ] Implementer action `Importer`.
-- [ ] Implementer action `Exporter`.
-- [ ] Implementer action `Supprimer` + confirmation.
-- [ ] Implementer etats vides/erreurs:
-  - [ ] no saves
-  - [ ] corrupted save
-  - [ ] migration failure
-  - [ ] invalid import
+- [x] Implementer CTA conditionnel `Continuer` (reprend la save la plus recente).
+- [x] Implementer CTA `Nouvelle partie`.
+- [x] Implementer vue `Charger` slots.
+- [x] Implementer action `Importer` depuis la popup `Charger`.
+- [x] Implementer action `Exporter`.
+- [x] Implementer action `Supprimer` + confirmation.
+- [x] Sur entree directe `/game`, auto-charger la save la plus recente (equivalent `Continuer`) si elle existe.
+- [x] Afficher popup bilan offline apres `loadSave` si offline > 2 min et gains > 0.
+- [x] Mapper tous les libelles/messages des flows vers le catalogue de textes `fr-FR`.
+- [x] Implementer etats vides/erreurs:
+  - [x] no saves
+  - [x] corrupted save
+  - [x] migration failure
+  - [x] invalid import
 
 ## 7.4 UI smoke tests
 
-- [ ] test smoke `Nouvelle partie`.
-- [ ] test smoke `Charger`.
-- [ ] test smoke `Importer`.
-- [ ] test smoke `Supprimer`.
+- [x] test smoke `Nouvelle partie`.
+- [x] test smoke `Charger`.
+- [x] test smoke `Importer`.
+- [x] test smoke `Supprimer`.
+- [x] test smoke popup bilan offline (affichage unique par reprise).
+- [x] test smoke resolution des textes via keys (fallback key manquante).
 
 ## 7.5 Quality gate
 
-- [ ] `npm run lint`
-- [ ] `npm run typecheck`
-- [ ] `npm run test`
+- [x] `npm run lint`
+- [x] `npm run typecheck`
+- [x] `npm run test`
 
 ---
 
@@ -365,54 +385,58 @@
 
 ## 8.1 Layout implementation
 
-- [ ] Colonne stats gauche.
-- [ ] Vue simulation centrale.
-- [ ] Zone cartes upgrades.
-- [ ] Responsive minimum desktop -> laptop.
+- [x] Colonne stats gauche.
+- [x] Vue simulation centrale.
+- [x] Zone cartes upgrades.
+- [x] Responsive minimum desktop -> laptop.
 
 ## 8.2 Stats panel
 
-- [ ] afficher `packages/sec`.
-- [ ] afficher `euro/sec`.
-- [ ] afficher `employees/capacity`.
-- [ ] afficher `tick duration`.
-- [ ] afficher `next warehouse cost`.
+- [x] afficher `packages/sec`.
+- [x] afficher `euro/sec`.
+- [x] afficher `employees/capacity`.
+- [x] afficher `tick duration`.
+- [x] afficher `next warehouse cost`.
 
-## 8.3 Upgrade cards
+## 8.3 Upgrade hotspots (entrepot)
 
-- [ ] cards `employees`.
-- [ ] cards `scanners`.
-- [ ] cards `conveyors`.
-- [ ] cards `carts`.
-- [ ] cards `trucks`.
-- [ ] afficher level current/next, cost, effet.
-- [ ] etat disabled si achat impossible.
+- [x] hotspot `employees`.
+- [x] hotspot `scanners`.
+- [x] hotspot `conveyors`.
+- [x] hotspot `carts`.
+- [x] hotspot `trucks`.
+- [x] afficher niveau par hotspot (vue par defaut).
+- [x] afficher details upgrade au hover/focus (description fonctionnelle, effet, cout, etat).
+- [x] click hotspot => tentative d'achat upgrade associee.
 
 ## 8.4 Warehouse overlays
 
-- [ ] ecran demenagement (reset) complet.
-- [ ] recap gain skill point.
-- [ ] CTA unique reprise run.
+- [x] ecran demenagement (reset) complet.
+- [x] recap gain skill point.
+- [x] CTA unique reprise run.
+- [x] popup "Resume offline" (temps, colis, euros).
 
 ## 8.5 Skill tree overlay
 
-- [ ] arborescence branches principales.
-- [ ] prerequis visuels.
-- [ ] interactions unlock.
-- [ ] tooltips effets.
-- [ ] branche cachee et conditions d'affichage.
+- [x] arborescence branches principales.
+- [x] prerequis visuels.
+- [x] interactions unlock.
+- [x] tooltips effets.
+- [x] branche cachee et conditions d'affichage.
+- [x] catalogue v1 complet aligne draft: 7 branches principales + offline + cheat.
 
 ## 8.6 Feedback UX
 
-- [ ] hover cards.
-- [ ] click feedback.
-- [ ] increments numeriques lisses.
+- [x] hover cards.
+- [x] click feedback.
+- [x] increments numeriques lisses.
+- [x] systeme global de notifications toast en haut a droite (style industriel, auto-dismiss).
 
 ## 8.7 Quality gate
 
-- [ ] `npm run lint`
-- [ ] `npm run typecheck`
-- [ ] `npm run test`
+- [x] `npm run lint`
+- [x] `npm run typecheck`
+- [x] `npm run test`
 
 ---
 
@@ -420,12 +444,12 @@
 
 ## 9.1 Warehouse scene primitives
 
-- [ ] zone entree.
-- [ ] zone scan.
-- [ ] zone tri.
-- [ ] tapis roulants.
-- [ ] zone expedition.
-- [ ] camions.
+- [x] zone entree.
+- [x] zone scan.
+- [x] zone tri.
+- [x] tapis roulants.
+- [x] zone expedition.
+- [x] camions.
 
 ## 9.2 Dynamic animations
 
@@ -520,6 +544,7 @@
 
 - [ ] fixtures saves par version.
 - [ ] fixtures balance catalog.
+- [ ] fixture text catalog `fr-FR.v1` (keys mandatory).
 - [ ] fixtures huge numbers.
 
 ## 12.3 Bug bash technique
@@ -605,6 +630,7 @@
 - [ ] cloud save.
 - [ ] additional branches/events.
 - [ ] deeper meta systems.
+- [ ] add locale catalog `en-US` (same keys as `fr-FR`) without UI refactor.
 
 ---
 

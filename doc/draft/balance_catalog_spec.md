@@ -77,7 +77,22 @@ Upgrades principales:
 
 Meta progression:
 - branches de competences -> scales dediees par branche/niveau
+  - v1 skill ids:
+    - `staff.mastery`
+    - `scan.mastery`
+    - `conveyor.mastery`
+    - `sorting.mastery`
+    - `shipping.mastery`
+    - `warehouse.mastery`
+    - `offline.resilience`
+    - `cheat.optimization` (branche cachee)
 - branche cachee -> scales specifiques avec contraintes de debloquage
+  - v1: unlock apres completion des 7 branches principales (35 niveaux / 35)
+- branche offline v1: **un seul skill de branche** (`offline.resilience`) dont chaque niveau
+  augmente en meme temps:
+  - l'efficacite offline
+  - la duree offline max
+  via deux courbes d'effet liees au meme niveau de skill
 
 Entrepots:
 - couts de paliers via scales

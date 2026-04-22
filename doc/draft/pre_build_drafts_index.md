@@ -9,6 +9,7 @@
 - `save_contract_and_migrations.md`
 - `main_menu_flows.md`
 - `number_notation_spec.md`
+- `ui_text_catalog_spec.md`
 - `testing_strategy_matrix.md`
 - `quality_gates_and_ci.md`
 - `performance_budget.md`
@@ -20,6 +21,7 @@
 - `centre_tri_game_design.md`
 - `skill_tree_centre_tri.md`
 - `ui_design_spec.md`
+- `ui_text_catalog_spec.md`
 
 ## Suggested Fill Order
 
@@ -30,7 +32,7 @@
 5. `save_contract_and_migrations.md`
 6. `main_menu_flows.md`
 7. `number_notation_spec.md`
-8. `testing_strategy_matrix.md`
-9. `quality_gates_and_ci.md`
-10. `performance_budget.md`
-
+8. `ui_text_catalog_spec.md`
+9. `testing_strategy_matrix.md`
+10. `quality_gates_and_ci.md`
+11. `performance_budget.md`

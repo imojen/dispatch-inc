@@ -35,6 +35,14 @@ Goals:
 - Curves are declared in a single balance catalog and resolved by `scaleId`
 - Supported curve families: `linear`, `exponential`, `power`, `piecewise`, `softcap`
 
+## UI Text Catalog (centralized)
+
+- V1 UI/UX language: French only (`fr-FR`)
+- Centralized text catalog for all UI labels/messages/buttons
+- No hardcoded UI strings in pages/components/stores
+- Text resolution by key from presentation layer
+- Locale-ready architecture: adding `en-US` later should require a new catalog file, not component refactors
+
 ## Testing
 
 - Vitest
@@ -89,6 +97,7 @@ Use typed DTOs for:
 - Use-case input/output (`RunTickInputDto`, `RunTickOutputDto`, etc.)
 - Save payloads (`SaveSlotDto`, `GameStateDto`)
 - Balance payloads (`ScaleSpecDto`, `UpgradeBalanceDto`, `BalanceCatalogDto`)
+- UI text payloads (`UiTextCatalogDto`)
 - Import/export payloads
 - Persistence migration payloads
 
@@ -132,10 +141,12 @@ Use typed DTOs for:
           game.ts
           save.ts
           balance.ts
+          content.ts
         ports/
           SaveRepository.ts
           Clock.ts
           BalanceCatalogRepository.ts
+          TextCatalogRepository.ts
         useCases/
           runTick.ts
           applyOfflineProgress.ts
@@ -146,6 +157,7 @@ Use typed DTOs for:
           deleteSave.ts
           exportSave.ts
           importSave.ts
+          getUiTextBundle.ts
 
       domain/
         balance/
@@ -171,6 +183,13 @@ Use typed DTOs for:
           services/
 
       infrastructure/
+        content/
+          catalog/
+            fr-FR.v1.ts
+          validators/
+            textCatalogSchema.ts
+          mappers/
+            textCatalogMapper.ts
         balance/
           catalog/
             localCatalog.ts
@@ -189,6 +208,8 @@ Use typed DTOs for:
           browserClock.ts
 
       data/
+        content/
+          fr-FR.v1.ts
         balance/
           catalog.v1.ts
         upgrades.ts
@@ -221,12 +242,13 @@ Use typed DTOs for:
 - Tickrate is a gameplay variable (`simulation.tickRate`)
 - Base tickrate is configurable and can evolve through upgrades/skills
 - Tick interval = `1 / tickRate`
+- Tickrate must affect real throughput: increasing tickrate increases `packages/sec` and `money/sec`
 - UI rendering remains independent from logic ticks
 
 ## Determinism rules
 
 - Simulation uses fixed-step logic ticks
-- Production is expressed per second, then integrated with `deltaTime`
+- Production per second is derived from per-tick output multiplied by effective `tickRate`, then integrated with `deltaTime`
 - `deltaTime` is clamped per frame (anti-freeze spike)
 - Tickrate changes must not create rounding exploits
 - Tick orchestration is done by an application use-case (`runTick`)
@@ -311,8 +333,9 @@ DDD responsibilities:
 
 ## Main menu flow
 
+- `Continuer` resumes the latest save slot (visible only when saves exist)
 - `Nouvelle partie` creates a new save slot
-- `Charger` opens the local save slot list
+- `Charger` opens the local save slot list (play/export/delete/import)
 - One game run = one save JSON
 
 ## Slot model
@@ -365,6 +388,24 @@ On load:
 Rules:
 - Must use the same domain logic as tick simulation
 - Executed through application use-case, delegated to domain services
+- Offline mode trigger:
+  - browser closed, or tab inactive for more than 2 minutes
+- Base offline production policy (no offline skill investment):
+  - efficiency multiplier: 20%
+  - max rewarded duration: 1 hour
+  - no rewards after cap
+- Offline skill branch must scale both values up to:
+  - efficiency multiplier: 100% at max level
+  - max rewarded duration: 6 hours at max level
+- Offline computation must clamp rewarded delta according to current offline cap
+- Offline report contract must be produced by application layer on resume/load:
+  - `countedOfflineDuration`
+  - `offlinePackagesDispatched`
+  - `offlineMoneyGained`
+- Presentation must show an offline summary popup when:
+  - offline delta > 2 minutes
+  - and computed gains > 0
+- Popup is informational only and shown once per resume/load event
 
 ---
 
@@ -438,6 +479,8 @@ test("basic production", () => {
 
 - Stacking effects
 - Edge cases
+- Offline branch progression (20%/1h -> 100%/6h)
+- Offline cap clamping behavior
 
 ### Reset
 
@@ -456,6 +499,17 @@ test("basic production", () => {
 ### Offline system
 
 - Correct delta application
+- Trigger detection after 2 minutes inactivity
+- Respect efficiency and duration caps by skill level
+- No reward beyond configured max offline duration
+- Offline report values consistency (duration/packages/money)
+- Popup display condition and one-time display behavior
+
+### UI content system
+
+- Text catalog loading and validation
+- Missing key fallback behavior
+- No hardcoded UI text in critical screens
 
 ---
 
@@ -470,6 +524,7 @@ test("basic production", () => {
 - Use DTOs at every layer boundary
 - Keep domain framework-agnostic
 - Route all balance/scaling logic through `ScaleEngine` + catalog
+- Route all UI labels/messages through centralized text catalog (`fr-FR` in v1)
 
 ## MUST NOT
 
@@ -479,6 +534,7 @@ test("basic production", () => {
 - Mix UI and domain logic
 - Bypass application use-cases for game-critical actions
 - Hardcode upgrade cost/effect formulas outside the centralized balance catalog
+- Hardcode UI/UX strings in components/pages/stores
 
 ---
 
@@ -521,11 +577,13 @@ test("basic production", () => {
 ## Main Menu UX (Save-first entrypoint)
 
 On app start, show:
+- `Continuer` (if at least one save exists)
 - `Nouvelle partie`
 - `Charger`
 
+If user continues, load latest slot then hydrate state from its JSON DTO.
 If user creates a run, initialize a new slot and enter game.  
-If user loads, select an existing slot then hydrate state from its JSON DTO.
+If user loads, open save modal then select/import an existing slot.
 
 ---
 
@@ -542,6 +600,7 @@ If user loads, select an existing slot then hydrate state from its JSON DTO.
 
 - IndexedDB adapter (same `SaveRepository` port)
 - Remote balance catalog adapter (same `BalanceCatalogRepository` port)
+- Multi-locale text catalogs (same `TextCatalogRepository` port)
 - Web Workers for simulation orchestration
 - Optional cloud save adapter
 

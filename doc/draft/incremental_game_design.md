@@ -87,6 +87,14 @@ Player can invest freely across multiple branches:
 -   Increase tick rate
 -   Improve offline production
 -   Temporal boosts
+-   Increasing tick rate must increase real throughput per second (not only simulation granularity)
+
+Offline baseline rule for this project variant:
+
+-   Offline mode starts if tab is inactive for more than 2 minutes (or browser closed)
+-   Base offline efficiency: 20%
+-   Base offline max duration: 1 hour
+-   Time/offline skills can raise efficiency and max duration up to 100% and 6 hours
 
 ### 6. Rule Alteration
 

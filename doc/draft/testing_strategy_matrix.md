@@ -10,6 +10,7 @@ Definir une matrice de tests executable pour la v1.
 - `src/application/**`: 100%
 - `src/infrastructure/persistence/**`: coverage contract + scenarios critiques
 - `src/infrastructure/balance/**`: validation + mapping + integration coverage
+- `src/infrastructure/content/**`: text catalog validation + mapping coverage
 
 ## Test Layers
 
@@ -44,6 +45,7 @@ Rules:
 Scope:
 - `SaveRepository` localStorage adapter
 - `BalanceCatalogRepository` adapter
+- `TextCatalogRepository` adapter
 - migration chain
 
 Rules:
@@ -53,10 +55,12 @@ Rules:
 ### 4. UI Smoke Tests
 
 Scope:
+- `Continuer`
 - `Nouvelle partie`
 - `Charger`
-- `Importer`
+- `Importer` (depuis popup `Charger`)
 - `Supprimer`
+- offline summary popup after resume/load
 - fallback erreurs critiques
 
 Rules:
@@ -71,10 +75,13 @@ Rules:
 - Save migration chain correctness
 - Scale curve correctness (`linear`, `exponential`, `power`, `piecewise`, `softcap`)
 - Big-number rounding consistency
+- Offline summary popup correctness (duration/packages/money)
+- Text catalog key coverage and missing-key fallback behavior
 
 ## Regression Strategy
 
 - Golden fixtures for balance catalog (`catalog.v1`)
+- Golden fixture for text catalog (`fr-FR.v1`)
 - Save fixtures per version (`save.v1`, `save.v2`, ...)
 - Large-number edge fixtures (`1e3`, `1e6`, `1e12`, `1e1000`)
 - Snapshot suite for notation modes and thresholds
@@ -90,7 +97,10 @@ Rules:
 - `application/progressionFlows.spec.ts`
 - `infra/localStorageSaveRepository.spec.ts`
 - `infra/balanceCatalog.spec.ts`
+- `infra/textCatalog.spec.ts`
 - `ui/mainMenu.smoke.spec.ts`
+- `ui/offlineSummaryPopup.smoke.spec.ts`
+- `ui/textCatalogResolution.smoke.spec.ts`
 
 ## CI Gates
 

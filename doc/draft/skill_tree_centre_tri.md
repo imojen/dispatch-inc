@@ -7,6 +7,10 @@
 -   Déblocage progressif : niveau N nécessite N-1
 -   Effets **cumulatifs**
 -   Progression libre (pas de verrouillage entre branches)
+-   Mode offline de base (sans skill) :
+    -   activation si navigateur fermé ou onglet inactif depuis plus de **2 minutes**
+    -   employés à **20%** d'efficacité
+    -   rendement limité à **1 heure**
 
 ------------------------------------------------------------------------
 
@@ -84,9 +88,42 @@ Augmentation de la capacité.
 
 ------------------------------------------------------------------------
 
+## 🌙 Résilience offline
+
+Production en absence du joueur (navigateur fermé ou onglet inactif).
+
+Base sans skill : **20% pendant 1h max**.
+
+1.  Continuité opératoire I\
+    → +15% efficacité offline, +1h de durée max\
+    (total : 35% pendant 2h max)
+
+2.  Continuité opératoire II\
+    → +15% efficacité offline, +1h de durée max\
+    (total : 50% pendant 3h max)
+
+3.  Continuité opératoire III\
+    → +20% efficacité offline, +1h de durée max\
+    (total : 70% pendant 4h max)
+
+4.  Continuité opératoire IV\
+    → +15% efficacité offline, +1h de durée max\
+    (total : 85% pendant 5h max)
+
+5.  Centre autonome\
+    → +15% efficacité offline, +1h de durée max\
+    (total : **100% pendant 6h max**)
+
+------------------------------------------------------------------------
+
 # 🌀 Branche cachée --- Optimisation non conventionnelle
 
 Déblocage spécial.
+
+Condition de déblocage (v1) :
+
+- Avoir maxé les **7 branches principales** au niveau 5
+- Soit **35 niveaux** débloqués sur les branches principales (35/35)
 
 ## Fantasme
 
@@ -111,7 +148,7 @@ Contourner les règles du système logistique.
 
 ## 🎯 Résumé
 
--   6 branches principales équilibrées
+-   7 branches principales équilibrées
 -   1 branche cachée "cheat"
 -   Progression libre et cumulative
 -   Chaque reset = saut de puissance significatif

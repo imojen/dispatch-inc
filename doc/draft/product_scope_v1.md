@@ -46,6 +46,8 @@ Documents de reference:
 - Simulation entrepot animee et lisible
 - Cartes d'upgrade, overlays, ecran arbre de competences
 - Feedback visuel instantane sur les actions critiques
+- Catalogue de textes UI centralise (`fr-FR`) sans textes hardcodes dans les composants
+- Architecture prete multi-langues (ajout futur d'une langue via fichier catalogue)
 
 ### Donnees, persistance, qualite
 
@@ -65,6 +67,7 @@ Backlog conditionnel (si temps/disponibilite):
 - Cloud save
 - Remote balance catalog
 - Worker/offloading avance
+- Publication de locales additionnelles (`en-US`, etc.)
 
 ## Acceptance Criteria v1
 
