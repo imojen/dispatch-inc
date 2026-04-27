@@ -70,7 +70,7 @@ export function createPurchaseUpgradeUseCase(
 
       if (input.upgradeId === 'employees') {
         const resolved = resolveGameState(state, resolver)
-        if (!canHireEmployee(resolved.runState.employees, resolved.warehouseCapacity)) {
+        if (!canHireEmployee(resolved.runState.ownedEmployees, resolved.warehouseCapacity)) {
           return gameFailure('CAPACITY_REACHED', 'Warehouse employee capacity reached.')
         }
       }

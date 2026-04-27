@@ -3,6 +3,7 @@ import type { GameStateDto } from '@/application/dto/game'
 import { createPurchaseUpgradeUseCase } from '@/application/useCases/purchaseUpgrade'
 import { createTriggerWarehouseResetUseCase } from '@/application/useCases/triggerWarehouseReset'
 import { createUnlockSkillUseCase } from '@/application/useCases/unlockSkill'
+import { WAREHOUSE_RESET_STARTING_MONEY } from '@/domain/game/services/reset'
 import { LocalBalanceCatalogRepository } from '@/infrastructure/balance/catalog/localCatalog'
 
 class StubClock {
@@ -104,6 +105,60 @@ describe('chapter 6 - progression use-cases', () => {
     }
   })
 
+  it('purchaseUpgrade allows more employees when warehouse mastery boosts capacity', async () => {
+    const repository = new LocalBalanceCatalogRepository()
+    const purchaseUpgrade = createPurchaseUpgradeUseCase(repository)
+
+    const result = await purchaseUpgrade({
+      state: createBaseState({
+        upgrades: {
+          employees: { level: 10 },
+          scanners: { level: 0 },
+          conveyors: { level: 0 },
+          carts: { level: 0 },
+          trucks: { level: 0 },
+        },
+        skills: {
+          'offline.resilience': { level: 0 },
+          'warehouse.mastery': { level: 1 },
+        },
+      }),
+      upgradeId: 'employees',
+    })
+
+    expect(result.ok).toBe(true)
+    if (result.ok) {
+      expect(result.value.state.upgrades.employees.level).toBe(11)
+    }
+  })
+
+  it('purchaseUpgrade uses bought employees for capacity, not boosted staff mastery output', async () => {
+    const repository = new LocalBalanceCatalogRepository()
+    const purchaseUpgrade = createPurchaseUpgradeUseCase(repository)
+
+    const result = await purchaseUpgrade({
+      state: createBaseState({
+        upgrades: {
+          employees: { level: 4 },
+          scanners: { level: 0 },
+          conveyors: { level: 0 },
+          carts: { level: 0 },
+          trucks: { level: 0 },
+        },
+        skills: {
+          'offline.resilience': { level: 0 },
+          'staff.mastery': { level: 4 },
+        },
+      }),
+      upgradeId: 'employees',
+    })
+
+    expect(result.ok).toBe(true)
+    if (result.ok) {
+      expect(result.value.state.upgrades.employees.level).toBe(5)
+    }
+  })
+
   it('unlockSkill consumes skill points and upgrades level', async () => {
     const repository = new LocalBalanceCatalogRepository()
     const unlockSkill = createUnlockSkillUseCase(repository)
@@ -167,7 +222,9 @@ describe('chapter 6 - progression use-cases', () => {
       return
     }
 
-    expect(result.value.state.resources.money).toBe('0')
+    expect(result.value.state.resources.money).toBe(
+      String(WAREHOUSE_RESET_STARTING_MONEY),
+    )
     expect(result.value.state.resources.packages).toBe('0')
     expect(result.value.state.upgrades).toEqual({})
     expect(result.value.state.progression.warehouseLevel).toBe(2)

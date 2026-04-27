@@ -10,6 +10,35 @@ export interface ResolvedGameState {
   offlinePolicy: OfflinePolicy
 }
 
+function resolveSkillMultiplier(
+  resolver: BalanceResolver,
+  state: GameStateDto,
+  skillId: string,
+): number {
+  return resolver.resolveSkillEffect(skillId, getLevel(state.skills, skillId))
+}
+
+export function resolveUpgradeSkillMultiplier(
+  upgradeId: string,
+  state: GameStateDto,
+  resolver: BalanceResolver,
+): number {
+  switch (upgradeId) {
+    case 'employees':
+      return resolveSkillMultiplier(resolver, state, 'staff.mastery')
+    case 'scanners':
+      return resolveSkillMultiplier(resolver, state, 'scan.mastery')
+    case 'conveyors':
+      return resolveSkillMultiplier(resolver, state, 'conveyor.mastery')
+    case 'carts':
+      return resolveSkillMultiplier(resolver, state, 'sorting.mastery')
+    case 'trucks':
+      return resolveSkillMultiplier(resolver, state, 'shipping.mastery')
+    default:
+      return 1
+  }
+}
+
 function numericStringToFinite(value: string, path: string): number {
   const parsed = Number(value)
   if (!Number.isFinite(parsed)) {
@@ -57,6 +86,47 @@ function resolveEmployees(resolver: BalanceResolver, level: number): number {
   return Math.max(0, Math.round(raw - 1))
 }
 
+function resolveAsymptoticTickRate(
+  baseTickRate: number,
+  rawMultiplier: number,
+): number {
+  const safeBaseTickRate = Math.max(0, baseTickRate)
+  const safeRawMultiplier = Math.max(1, rawMultiplier)
+  return safeBaseTickRate * (2 - 1 / safeRawMultiplier)
+}
+
+function resolveCadenceThroughputMultiplier(rawMultiplier: number): number {
+  const safeRawMultiplier = Math.max(1, rawMultiplier)
+  const displayedCadenceMultiplier = 2 - 1 / safeRawMultiplier
+  return Math.sqrt(safeRawMultiplier / displayedCadenceMultiplier)
+}
+
+export function resolveEffectiveUpgradeEffect(
+  upgradeId: string,
+  baseEffect: number,
+  state: GameStateDto,
+  resolver: BalanceResolver,
+): number {
+  switch (upgradeId) {
+    case 'employees':
+      return Math.max(
+        1,
+        Math.round((baseEffect - 1) * resolveUpgradeSkillMultiplier(upgradeId, state, resolver)) +
+          1,
+      )
+    case 'scanners':
+      return baseEffect * resolveUpgradeSkillMultiplier(upgradeId, state, resolver)
+    case 'conveyors':
+      return baseEffect * resolveUpgradeSkillMultiplier(upgradeId, state, resolver)
+    case 'carts':
+      return baseEffect * resolveUpgradeSkillMultiplier(upgradeId, state, resolver)
+    case 'trucks':
+      return baseEffect * resolveUpgradeSkillMultiplier(upgradeId, state, resolver)
+    default:
+      return baseEffect
+  }
+}
+
 export function resolveGameState(
   state: GameStateDto,
   resolver: BalanceResolver,
@@ -68,26 +138,50 @@ export function resolveGameState(
   const trucksLevel = getLevel(state.upgrades, 'trucks')
 
   const offlineResilienceLevel = getLevel(state.skills, 'offline.resilience')
+  const staffMultiplier = resolveSkillMultiplier(resolver, state, 'staff.mastery')
+  const scanMultiplier = resolveSkillMultiplier(resolver, state, 'scan.mastery')
+  const conveyorSkillMultiplier = resolveSkillMultiplier(
+    resolver,
+    state,
+    'conveyor.mastery',
+  )
+  const sortingMultiplier = resolveSkillMultiplier(resolver, state, 'sorting.mastery')
+  const shippingMultiplier = resolveSkillMultiplier(resolver, state, 'shipping.mastery')
+  const warehouseMultiplier = resolveSkillMultiplier(resolver, state, 'warehouse.mastery')
 
   const baseTickRate = numericStringToFinite(state.simulation.tickRate, 'simulation.tickRate')
+  const baseEmployees = resolveEmployees(resolver, employeesLevel)
+  const baseScannerBonus = resolver.resolveUpgradeEffect('scanners', scannersLevel)
   const conveyorTickMultiplier = resolver.resolveUpgradeEffect('conveyors', conveyorsLevel)
+  const baseCartMultiplier = resolver.resolveUpgradeEffect('carts', cartsLevel)
+  const baseTruckMultiplier = resolver.resolveUpgradeEffect('trucks', trucksLevel)
+  const rawCadenceMultiplier = conveyorTickMultiplier * conveyorSkillMultiplier
 
   const runState: GameRunState = {
     money: numericStringToFinite(state.resources.money, 'resources.money'),
     packages: numericStringToFinite(state.resources.packages, 'resources.packages'),
-    employees: resolveEmployees(resolver, employeesLevel),
-    scannerBonus: resolver.resolveUpgradeEffect('scanners', scannersLevel),
-    cartMultiplier: resolver.resolveUpgradeEffect('carts', cartsLevel),
-    truckMultiplier: resolver.resolveUpgradeEffect('trucks', trucksLevel),
-    tickRate: baseTickRate * conveyorTickMultiplier,
+    ownedEmployees: baseEmployees,
+    employees: Math.max(0, Math.round(baseEmployees * staffMultiplier)),
+    scannerBonus: baseScannerBonus * scanMultiplier,
+    cartMultiplier: baseCartMultiplier * sortingMultiplier,
+    truckMultiplier: baseTruckMultiplier * shippingMultiplier,
+    tickRate: resolveAsymptoticTickRate(baseTickRate, rawCadenceMultiplier),
+    cadenceThroughputMultiplier: resolveCadenceThroughputMultiplier(
+      rawCadenceMultiplier,
+    ),
     warehouseLevel: state.progression.warehouseLevel,
     skillPoints: state.progression.skillPoints,
     upgrades: state.upgrades,
   }
 
-  const warehouseCapacity = resolver.resolveWarehouseEffect(
-    'warehouse.progression',
-    state.progression.warehouseLevel,
+  const warehouseCapacity = Math.max(
+    0,
+    Math.round(
+      resolver.resolveWarehouseEffect(
+        'warehouse.progression',
+        state.progression.warehouseLevel,
+      ) * warehouseMultiplier,
+    ),
   )
 
   const offlinePolicy: OfflinePolicy = {

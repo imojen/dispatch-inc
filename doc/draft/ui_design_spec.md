@@ -6,14 +6,14 @@ This document defines the **complete visual, UI, and UX expectations**
 for the game. It is written to be interpreted and executed by an AI or
 developer.
 
-The goal is: - Clean - Modern - Highly readable - Extremely satisfying
+The goal is: - Retro terminal / Minitel - Highly readable - Playful industrial console - Extremely satisfying
 in idle
 
 ------------------------------------------------------------------------
 
 # 🧭 CORE DESIGN PRINCIPLE
 
-> The player must enjoy watching the system run without interacting.
+> The player must enjoy watching the system run as if operating an old industrial terminal.
 
 The UI must: - Be readable in \< 2 seconds - Show progression visually
 (not only numerically) - Feel alive at all times
@@ -33,16 +33,16 @@ The UI must: - Be readable in \< 2 seconds - Show progression visually
 
 # 🖥️ GLOBAL LAYOUT
 
-## Structure (Desktop-first)
+## Structure (Vertical-first)
 
--   Left column: Stats panel (fixed width)
--   Center: Warehouse simulation (main focus)
--   Upgrade controls are integrated directly in warehouse hotspots (no separate bottom upgrade bar)
--   No dedicated top gameplay title bar in game view; title/subtitle and primary actions are integrated in the stats panel
--   Warehouse area has no additional card header (no `Simulation entrepot` title/subtitle block)
--   Stats panel and warehouse area are visually adjacent (no large spacing gap)
--   Warehouse area is docked to the top of the game viewport and framed with an industrial hazard border
--   On game view, warehouse + border must fill viewport height (`100dvh`) and page must not scroll
+-   Single column layout
+-   Top header: large terminal frame with system label + action keys + `Entrepot niveau X`
+-   Under header: compact terminal stats modules (`Euros / sec`, `Colis / sec`, `Equipe`, `Cadence`) with secondary values on each module
+-   Upgrade controls are displayed below as a direct vertical list of terminal rows
+-   No dedicated left stats column in game view
+-   Footer: persistent terminal log / command hint bar
+-   Main panel is docked to the top of the viewport with a clean neutral surface
+-   On game view, the main panel must fill viewport height (`100dvh`) and page must not scroll
 
 Layout priority: - 70% visual simulation - 20% stats - 10% overlays/interactions
 
@@ -65,39 +65,29 @@ Menu principal (entree du jeu) :
 
 ------------------------------------------------------------------------
 
-# 🏭 CENTRAL VIEW --- WAREHOUSE SIMULATION
+# 🏭 CENTRAL VIEW --- HOTSPOT CONTROL PANEL
 
 ## Requirements
 
--   Top-down simplified view
--   Grid-based layout
--   No realism required
+-   No warehouse background asset in V1
+-   No regional overlay / positioned zones in V1
+-   Display a simple explicit list: one entry per hotspot / upgrade
 -   Must be readable at a glance
--   V1 uses the warehouse reference asset as simulation background (`assets/warehouse_v1.png` -> served in app as `public/warehouse_v1.png`)
--   Interactive regional hotspots are mandatory on top of the background:
-    - employees
-    - scan
-    - sorting
-    - conveyors
-    - shipping
--   Each region triggers the corresponding gameplay action (quick upgrade purchase)
+-   Each list entry triggers the corresponding gameplay action (quick upgrade purchase)
+-   The panel can later host a redesigned simulation, but the interaction model must stay list-first for now
 
 ## Elements to display
 
--   Entry zone
--   Scanner zone
--   Sorting area
--   Conveyor belts
--   Output/loading zone
--   Trucks
+-   Employees
+-   Scanners
+-   Conveyors
+-   Carts / sorting
+-   Trucks / shipping
 
 ## Dynamic behavior
 
--   Packages move continuously
--   Speed depends on upgrades
--   Density increases over time
--   More employees appear visually
--   Activity must never feel static
+-   No animated warehouse scene is required for this phase
+-   Focus on clarity, upgrade readability, and fast action feedback
 
 ------------------------------------------------------------------------
 
@@ -105,16 +95,16 @@ Menu principal (entree du jeu) :
 
 ## Base colors
 
--   Background: #F4F6F8
--   Panels: #FFFFFF
--   Borders: #E1E5EA
+-   Background: #020403
+-   Panels: #020403 / very dark green-black
+-   Borders: rgba(60,255,122,0.4)
 
 ## Functional colors
 
--   Primary: #2F80ED
--   Success: #27AE60
--   Warning: #F2994A
--   Error: #EB5757
+-   Primary phosphor: #3CFF7A
+-   Secondary phosphor: #1F8F4F
+-   Warning / blocked: #FF5F3C
+-   Error: #FF5F3C
 
 ## Warehouse colors
 
@@ -132,26 +122,31 @@ Menu principal (entree du jeu) :
 
 # 🧩 VISUAL STYLE
 
--   Flat design
--   Industrial UI accents for controls and overlays
--   Hard edge geometry on interactive elements (no rounded corners for buttons)
--   Strong hard shadows for actionable controls
--   Gradients allowed on controls/popup surfaces if they reinforce the industrial look
--   No visual noise
-
-Shadow example (controls): box-shadow: 4px 4px 0 rgba(32,40,50,1);
+-   Official direction: retro terminal / Minitel / ASCII
+-   Monospace typography everywhere in game view
+-   Uppercase headers and labels
+-   CRT-inspired scanlines and subtle phosphor glow are allowed
+-   Use frame lines, separators, and pseudo-ASCII composition instead of SaaS cards
+-   No visual noise outside the terminal fantasy
+-   Forbidden:
+    - white cards
+    - rounded modern dashboard buttons
+    - glassmorphism
+    - SaaS gradients
+    - soft modern drop shadows
 
 ------------------------------------------------------------------------
 
 # 🔘 GLOBAL BUTTON SYSTEM (MANDATORY)
 
-- All game buttons must use the same industrial style system (home + in-game + popups).
+- All game buttons must use the same terminal command style system (home + in-game + popups).
 - Visual requirements:
   - square corners (`border-radius: 0`)
-  - strong border and hard shadow
-  - condensed/technical typography feel (uppercase recommended)
+  - thin phosphor outline
+  - monospace typography
   - clear pressed state
-  - geometric hover motion (slight translate/skew)
+  - restrained hover motion or line highlight
+  - command phrasing preferred: `[A] ACHETER`, `[Q] QUITTER`
 - Variants allowed:
   - primary
   - danger
@@ -198,11 +193,11 @@ Shadow example (controls): box-shadow: 4px 4px 0 rgba(32,40,50,1);
 
 -   Single global toast stack, positioned top-right of the viewport
 -   All gameplay/menu notifications must go through this stack (`save`, `upgrade`, `skill`, `errors`, etc.)
--   Industrial style rules:
-    - hard corners
-    - strong border + hard shadow
-    - compact framed look
-    - technical inner frame + rivet-like corner accents (instead of a top stripe band)
+-   Terminal style rules:
+    - dark background
+    - phosphor text
+    - thin green border
+    - no modern notification styling
 -   Toast background must remain neutral (no green/red/blue full-surface backgrounds)
 -   Toast width must adapt to its content with a safe max width on small screens
 -   Toast content must be vertically centered
@@ -220,13 +215,19 @@ Shadow example (controls): box-shadow: 4px 4px 0 rgba(32,40,50,1);
 
 ## Content
 
--   Packages/sec
--   €/sec
--   Employees / capacity
--   Tick duration
--   Next warehouse cost
--   Compact action buttons:
-    - `Competences`
+-   Terminal stat modules must expose:
+    - `Euros / sec` + total euros
+    - `Colis / sec` + total colis
+    - `Equipe` + employees/capacity
+    - `Cadence` + tick duration + next warehouse cost
+
+Example spirit:
+
+`┌──────────────┬──────────────┬──────────────┬──────────────┐`
+`│ EUROS / SEC  │ COLIS / SEC  │ EQUIPE       │ CADENCE      │`
+`│ 10           │ 0            │ 0 / 10       │ 1000 MS      │`
+`│ TOTAL: 10    │ TOTAL: 0     │ CAP: 10      │ NEXT: 1K     │`
+`└──────────────┴──────────────┴──────────────┴──────────────┘`
     - `Demenager`
     - `Retour au menu`
 
@@ -251,9 +252,9 @@ Shadow example (controls): box-shadow: 4px 4px 0 rgba(32,40,50,1);
 
 ## Structure
 
-Each hotspot must contain (default visible): - Icon - Title - Current level
+Each hotspot/list entry must contain (default visible): - Icon - Title - Current level
 
-On hover/focus, the hotspot must reveal: - Functional description sentence of the upgrade (what it does in gameplay terms) - Current/next effect - Cost - Availability feedback (blocked reason or buy action)
+Each hotspot/list entry must also expose: - Functional description sentence of the upgrade (what it does in gameplay terms) - Current/next effect - Cost - Availability feedback (blocked reason or buy action)
 
 ## Behavior
 

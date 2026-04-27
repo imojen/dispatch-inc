@@ -381,14 +381,17 @@ Directory assets/ contient :
 
 ---
 
-# Chapter 8 --- Core Gameplay UI (Stats, Upgrades, Warehouse View)
+# Chapter 8 --- Core Gameplay UI (Stats, Upgrades, Central Panel)
 
 ## 8.1 Layout implementation
 
-- [x] Colonne stats gauche.
-- [x] Vue simulation centrale.
-- [x] Zone cartes upgrades.
+- [x] Layout vertical mono-colonne.
+- [x] Header principal `Entrepot niveau X`.
+- [x] Barre ressources compacte avec popup stats secondaires.
+- [x] Liste verticale des upgrades.
 - [x] Responsive minimum desktop -> laptop.
+- [x] Refonte direction artistique terminal retro / Minitel / ASCII.
+- [x] Footer log terminal avec hints de commande.
 
 ## 8.2 Stats panel
 
@@ -398,16 +401,16 @@ Directory assets/ contient :
 - [x] afficher `tick duration`.
 - [x] afficher `next warehouse cost`.
 
-## 8.3 Upgrade hotspots (entrepot)
+## 8.3 Upgrade entries (liste hotspots)
 
-- [x] hotspot `employees`.
-- [x] hotspot `scanners`.
-- [x] hotspot `conveyors`.
-- [x] hotspot `carts`.
-- [x] hotspot `trucks`.
-- [x] afficher niveau par hotspot (vue par defaut).
-- [x] afficher details upgrade au hover/focus (description fonctionnelle, effet, cout, etat).
-- [x] click hotspot => tentative d'achat upgrade associee.
+- [x] entree `employees`.
+- [x] entree `scanners`.
+- [x] entree `conveyors`.
+- [x] entree `carts`.
+- [x] entree `trucks`.
+- [x] afficher niveau par entree (vue par defaut).
+- [x] afficher details upgrade dans chaque entree (description fonctionnelle, effet, cout, etat).
+- [x] click entree => tentative d'achat upgrade associee.
 
 ## 8.4 Warehouse overlays
 
@@ -440,18 +443,24 @@ Directory assets/ contient :
 
 ---
 
-# Chapter 9 --- Simulation Visual Layer (Idle Satisfaction)
+# Chapter 9 --- Future Simulation Visual Layer (Post-redesign)
 
-## 9.1 Warehouse scene primitives
+## 9.1 Current direction
 
-- [x] zone entree.
-- [x] zone scan.
-- [x] zone tri.
-- [x] tapis roulants.
-- [x] zone expedition.
-- [x] camions.
+- [x] supprimer la dependance a un asset de background pour le panneau central.
+- [x] supprimer la notion de zones/regiones positionnees pour les upgrades.
+- [x] utiliser temporairement une liste simple de hotspots actionable.
 
-## 9.2 Dynamic animations
+## 9.2 Future visual scene primitives
+
+- [ ] zone entree.
+- [ ] zone scan.
+- [ ] zone tri.
+- [ ] tapis roulants.
+- [ ] zone expedition.
+- [ ] camions.
+
+## 9.3 Dynamic animations
 
 - [ ] mouvement colis continu.
 - [ ] vitesse liee gameplay.
@@ -459,13 +468,13 @@ Directory assets/ contient :
 - [ ] apparition employees selon progression.
 - [ ] cycle camions spawn/wait/leave.
 
-## 9.3 Performance-safe rendering
+## 9.4 Performance-safe rendering
 
 - [ ] eviter rerender complet sur chaque tick.
 - [ ] utiliser donnees derivees memoisees.
 - [ ] profiler animation loops.
 
-## 9.4 Quality gate
+## 9.5 Quality gate
 
 - [ ] `npm run lint`
 - [ ] `npm run typecheck`
@@ -580,7 +589,7 @@ Directory assets/ contient :
 ## 13.3 Mitigations si depassement
 
 - [ ] optimiser hotspots domain.
-- [ ] optimiser UI update granularity.
+- [x] optimiser UI update granularity.
 - [ ] preparer branche worker spike si seuil depasse.
 
 ---

@@ -3,7 +3,10 @@ import type {
   OfflinePolicy,
   OfflineReward,
 } from '@/domain/game/entities/GameRunState'
-import { computeMoneyPerSecond } from '@/domain/game/services/economy'
+import {
+  computeMoneyPerSecond,
+  computePackagesPerSecond,
+} from '@/domain/game/services/economy'
 
 export const OFFLINE_BASE_POLICY: OfflinePolicy = {
   triggerAfterMs: 2 * 60 * 1000,
@@ -38,9 +41,18 @@ export function computeOfflineRewards(
       cartMultiplier: state.cartMultiplier,
       truckMultiplier: state.truckMultiplier,
       tickRate: state.tickRate,
+      cadenceThroughputMultiplier: state.cadenceThroughputMultiplier,
     }) * policy.efficiencyMultiplier
 
-  const packagesPerSecond = moneyPerSecond / state.truckMultiplier
+  const packagesPerSecond =
+    computePackagesPerSecond({
+      employees: state.employees,
+      scannerBonus: state.scannerBonus,
+      cartMultiplier: state.cartMultiplier,
+      truckMultiplier: state.truckMultiplier,
+      tickRate: state.tickRate,
+      cadenceThroughputMultiplier: state.cadenceThroughputMultiplier,
+    }).toNumber() * policy.efficiencyMultiplier
 
   return {
     countedOfflineDurationMs,

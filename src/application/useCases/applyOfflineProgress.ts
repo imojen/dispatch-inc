@@ -13,15 +13,16 @@ import {
 } from '@/application/useCases/game/stateMappers'
 import { parseGameStateStrict } from '@/application/useCases/save/schema'
 import { BalanceResolver } from '@/domain/balance/services/balanceResolver'
-import { OFFLINE_BASE_POLICY, computeOfflineRewardedDurationMs } from '@/domain/game/services/offline'
+import { computeOfflineRewardedDurationMs } from '@/domain/game/services/offline'
 import { applyTick } from '@/domain/game/services/tick'
 
 const OFFLINE_REPLAY_CHUNK_MS = 1000
-const OFFLINE_REPLAY_WINDOW_LIMIT_MS = OFFLINE_BASE_POLICY.triggerAfterMs + 6 * 60 * 60 * 1000
+const OFFLINE_REPLAY_MAX_DURATION_MS = 6 * 60 * 60 * 1000
 
 export interface ApplyOfflineProgressInput {
   state: GameStateDto
   nowMs?: number
+  triggerAfterMsOverride?: number
 }
 
 export interface ApplyOfflineProgressOutput {
@@ -98,11 +99,20 @@ export function createApplyOfflineProgressUseCase(
       }
 
       const rawOfflineDurationMs = Math.max(0, nowMs - lastSeenMs)
-      const replayWindowDurationMs = Math.min(rawOfflineDurationMs, OFFLINE_REPLAY_WINDOW_LIMIT_MS)
+      const effectiveTriggerAfterMs = Math.max(
+        0,
+        input.triggerAfterMsOverride ?? resolved.offlinePolicy.triggerAfterMs,
+      )
+      const replayWindowLimitMs =
+        effectiveTriggerAfterMs + OFFLINE_REPLAY_MAX_DURATION_MS
+      const replayWindowDurationMs = Math.min(rawOfflineDurationMs, replayWindowLimitMs)
 
       const countedDurationMs = computeOfflineRewardedDurationMs(
         replayWindowDurationMs,
-        resolved.offlinePolicy,
+        {
+          ...resolved.offlinePolicy,
+          triggerAfterMs: effectiveTriggerAfterMs,
+        },
       )
 
       const replayed = replayOfflineRewardsInChunks({

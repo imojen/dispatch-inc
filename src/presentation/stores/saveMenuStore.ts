@@ -1,13 +1,10 @@
 import { defineStore } from 'pinia'
 import type { SaveSlotMetadataDto } from '@/application/dto/save'
-import { mapGameErrorToUiTextKey } from '@/application/useCases/game/contracts'
 import { mapSaveErrorToUiTextKey } from '@/application/useCases/save/contracts'
 import { appContainer } from '@/app/di'
 import { appRouter, ROUTE_GAME } from '@/presentation/router'
 import { useGameStore } from '@/presentation/stores/gameStore'
 import { useUiStore } from '@/presentation/stores/uiStore'
-
-const OFFLINE_POPUP_THRESHOLD_MS = 2 * 60 * 1000
 
 type SlotIssueKind = 'corrupted' | 'migrationFailure'
 
@@ -167,34 +164,7 @@ export const useSaveMenuStore = defineStore('saveMenu', {
       }
 
       const gameStore = useGameStore()
-      const applyOfflineProgress = appContainer.useCases.createApplyOfflineProgress()
-      const offlineResult = await applyOfflineProgress({ state: loaded.value.slot.data })
-
-      if (!offlineResult.ok) {
-        this.isWorking = false
-        this.notifyError(mapGameErrorToUiTextKey(offlineResult.error.code))
-        return
-      }
-
-      const offlineMoneyGained = Number(offlineResult.value.report.offlineMoneyGained)
-      const shouldShowOfflinePopup =
-        offlineResult.value.rawOfflineDurationMs > OFFLINE_POPUP_THRESHOLD_MS &&
-        offlineMoneyGained > 0
-
-      gameStore.setCurrentState(offlineResult.value.state)
-      gameStore.setOfflineReport(
-        shouldShowOfflinePopup ? offlineResult.value.report : null,
-        shouldShowOfflinePopup,
-      )
-
-      const autosaveActiveSlot = appContainer.useCases.createAutosaveActiveSlot()
-      const autosaveResult = await autosaveActiveSlot({
-        state: offlineResult.value.state,
-      })
-
-      if (!autosaveResult.ok) {
-        this.notifyError(mapSaveErrorToUiTextKey(autosaveResult.error.code))
-      }
+      gameStore.setLoadedStateForGameEntry(loaded.value.slot.data)
 
       await this.refreshSlots()
       this.isWorking = false
@@ -202,17 +172,16 @@ export const useSaveMenuStore = defineStore('saveMenu', {
     },
 
     async continueLatest(): Promise<void> {
-      if (this.slots.length === 0) {
-        await this.refreshSlots()
-      }
+      await this.refreshSlots()
 
-      const latest = this.slots[0]
-      if (!latest) {
+      const activeOrLatest =
+        this.slots.find((slot) => slot.id === this.activeSlotId) ?? this.slots[0]
+      if (!activeOrLatest) {
         this.notifyError('save.error.notFound')
         return
       }
 
-      await this.playSlot(latest.id)
+      await this.playSlot(activeOrLatest.id)
     },
 
     async exportSlot(slotId: string): Promise<void> {

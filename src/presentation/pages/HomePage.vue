@@ -1,48 +1,94 @@
 <template>
   <main class="page-shell home-minimal-page">
-    <section class="home-minimal-shell">
-      <div class="home-logo-wrap">
-        <img
-          class="home-logo"
-          :src="heroMainImage"
-          alt="Dispatch Inc"
-        >
-      </div>
+    <section class="home-terminal-shell">
+      <header class="home-terminal-header terminal-header">
+        <div class="terminal-frame-line">
+          <span>{{ t('home.terminal.brand') }}</span>
+          <nav class="terminal-function-bar">
+            <span>{{ t('home.terminal.help') }}</span>
+            <span>{{ t('home.terminal.stats') }}</span>
+            <span>{{ t('home.terminal.options') }}</span>
+          </nav>
+        </div>
+      </header>
 
-      <p class="home-tagline">
-        {{ t('home.tagline') }}
-      </p>
+      <section class="home-terminal-hero">
+        <div class="home-logo-wrap home-terminal-logo-panel">
+          <img
+            class="home-logo home-terminal-logo"
+            :src="heroMainImage"
+            alt="Dispatch Inc"
+          >
+        </div>
 
-      <div class="home-main-actions">
-        <button
-          v-if="hasSaves"
-          class="button button-primary button-lg"
-          :disabled="saveMenu.isWorking"
-          @click="onContinue"
-        >
-          {{ t('home.cta.continue') }}
-        </button>
-        <button
-          class="button button-lg"
-          :disabled="saveMenu.isWorking"
-          @click="openCreateModal"
-        >
-          {{ t('home.cta.newRun') }}
-        </button>
-        <button
-          class="button button-lg"
-          @click="saveMenu.openLoadView"
-        >
-          {{ t('home.cta.load') }}
-        </button>
-      </div>
+        <p class="home-terminal-tagline">
+          {{ t('home.tagline') }}
+        </p>
+
+        <div class="home-main-actions home-terminal-actions">
+          <button
+            v-if="hasSaves"
+            class="button button-primary button-lg home-terminal-action home-terminal-action-primary"
+            :disabled="saveMenu.isWorking"
+            @click="onContinue"
+          >
+            <span class="home-terminal-action-bracket">[</span>
+            <span class="home-terminal-action-copy">
+              > {{ t('home.cta.continue') }}
+            </span>
+            <span class="home-terminal-action-bracket">]</span>
+          </button>
+          <button
+            class="button button-lg home-terminal-action"
+            :disabled="saveMenu.isWorking"
+            @click="openCreateModal"
+          >
+            <span class="home-terminal-action-bracket">[</span>
+            <span class="home-terminal-action-copy">
+              {{ t('home.cta.newRun') }}
+            </span>
+            <span class="home-terminal-action-bracket">]</span>
+          </button>
+          <button
+            class="button button-lg home-terminal-action"
+            @click="saveMenu.openLoadView"
+          >
+            <span class="home-terminal-action-bracket">[</span>
+            <span class="home-terminal-action-copy">
+              {{ t('home.cta.load') }}
+            </span>
+            <span class="home-terminal-action-bracket">]</span>
+          </button>
+        </div>
+      </section>
+
+      <footer class="home-terminal-footer terminal-footer">
+        <div class="terminal-frame-body home-terminal-footer-grid">
+          <div class="home-terminal-footer-block">
+            <p>{{ t('home.terminal.systemOk') }}</p>
+            <p>{{ t('home.terminal.connection') }}</p>
+            <p>
+              {{ t('home.terminal.status') }}
+              <span
+                class="terminal-cursor"
+                aria-hidden="true"
+              >_</span>
+            </p>
+          </div>
+          <div class="home-terminal-footer-block home-terminal-footer-block-right">
+            <p>{{ t('home.terminal.hintNavigate') }}</p>
+            <p>{{ t('home.terminal.hintSelect') }}</p>
+            <p>{{ t('home.terminal.hintQuit') }}</p>
+          </div>
+        </div>
+      </footer>
     </section>
 
     <section
       v-if="isCreateModalOpen"
       class="overlay"
     >
-      <article class="overlay-card">
+      <article class="overlay-card home-terminal-modal">
         <header class="panel-header panel-header-popup">
           <h2 class="popup-title">
             {{ t('home.newRun.modalTitle') }}
@@ -91,7 +137,7 @@
       v-if="saveMenu.isLoadViewOpen"
       class="overlay"
     >
-      <article class="overlay-card overlay-card-large">
+      <article class="overlay-card overlay-card-large home-terminal-modal">
         <header class="panel-header panel-header-popup">
           <h2 class="popup-title">
             {{ t('home.load.title') }}
@@ -231,10 +277,9 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
+import heroMainImage from '../../../assets/dispatch-inc-transparent-v2.png'
 import { useSaveMenuStore } from '@/presentation/stores/saveMenuStore'
 import { useUiStore } from '@/presentation/stores/uiStore'
-
-const heroMainImage = '/dispatch-inc-transparent.png'
 
 const saveMenu = useSaveMenuStore()
 const ui = useUiStore()

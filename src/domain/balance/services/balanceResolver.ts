@@ -30,7 +30,7 @@ export class BalanceResolver {
   resolveUpgradeCost(upgradeId: string, level: number): number {
     const entry = this.requireUpgrade(upgradeId)
     const scale = this.requireScale(entry.costScaleId)
-    return evaluateScale(scale, level)
+    return Math.max(0, Math.floor(evaluateScale(scale, level)))
   }
 
   resolveUpgradeEffect(upgradeId: string, level: number): number {

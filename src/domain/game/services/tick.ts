@@ -13,6 +13,7 @@ function toEconomyInput(state: GameRunState): EconomyComputationInput {
     cartMultiplier: state.cartMultiplier,
     truckMultiplier: state.truckMultiplier,
     tickRate: state.tickRate,
+    cadenceThroughputMultiplier: state.cadenceThroughputMultiplier,
   }
 }
 

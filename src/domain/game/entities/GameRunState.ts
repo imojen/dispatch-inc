@@ -5,11 +5,13 @@ export interface UpgradeState {
 export interface GameRunState {
   money: number
   packages: number
+  ownedEmployees: number
   employees: number
   scannerBonus: number
   cartMultiplier: number
   truckMultiplier: number
   tickRate: number
+  cadenceThroughputMultiplier: number
   warehouseLevel: number
   skillPoints: number
   upgrades: Record<string, UpgradeState>

@@ -85,7 +85,7 @@ describe('chapter 7 smoke - save menu flows', () => {
     expect(saveMenu.slots).toHaveLength(0)
   })
 
-  it('smoke popup offline affichage unique par reprise', async () => {
+  it('smoke Charger ne calcule pas offline dans le store home', async () => {
     const saveMenu = useSaveMenuStore()
     const game = useGameStore()
 
@@ -115,14 +115,46 @@ describe('chapter 7 smoke - save menu flows', () => {
     await appRouter.push({ name: ROUTE_HOME })
     await saveMenu.playSlot(slotId)
 
-    expect(game.shouldShowOfflinePopup).toBe(true)
-    expect(game.offlineReport).not.toBeNull()
-
-    game.dismissOfflinePopup()
     expect(game.shouldShowOfflinePopup).toBe(false)
+    expect(game.offlineReport).toBeNull()
+  })
 
+  it('continue reprend prioritairement la save active', async () => {
+    const saveMenu = useSaveMenuStore()
+    const game = useGameStore()
+
+    await saveMenu.createNewRun('Older active run')
+    const activeSlotId = saveMenu.slots[0]?.id as string
+    const activeState = game.current as NonNullable<typeof game.current>
+
+    const autosaveActiveSlot = appContainer.useCases.createAutosaveActiveSlot()
+    const oldOfflineState = {
+      ...activeState,
+      simulation: {
+        ...activeState.simulation,
+        lastSeenAt: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(),
+      },
+      upgrades: {
+        ...activeState.upgrades,
+        employees: { level: 1 },
+      },
+    }
+    assertOk(await autosaveActiveSlot({ state: oldOfflineState }))
+
+    await saveMenu.createNewRun('Newer non-active metadata run')
+    const newerSlotId =
+      saveMenu.slots.find((slot) => slot.id !== activeSlotId)?.id as string
+    expect(newerSlotId).toBeTruthy()
+
+    const loadSave = appContainer.useCases.createLoadSave()
+    assertOk(await loadSave({ id: activeSlotId }))
+    await saveMenu.refreshSlots()
+
+    game.resetSession()
     await appRouter.push({ name: ROUTE_HOME })
-    await saveMenu.playSlot(slotId)
+    await saveMenu.continueLatest()
+
+    expect(game.current).not.toBeNull()
     expect(game.shouldShowOfflinePopup).toBe(false)
   })
 })

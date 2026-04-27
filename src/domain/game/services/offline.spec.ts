@@ -10,6 +10,7 @@ import { applyTick } from '@/domain/game/services/tick'
 const state: GameRunState = {
   money: 0,
   packages: 0,
+  ownedEmployees: 10,
   employees: 10,
   scannerBonus: 0,
   cartMultiplier: 1,

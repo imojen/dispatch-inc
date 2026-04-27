@@ -1,6 +1,10 @@
 import type { BalanceCatalogDto } from '@/application/dto/balance'
 import type { GameStateDto } from '@/application/dto/game'
-import { resolveGameState } from '@/application/useCases/game/stateMappers'
+import {
+  resolveEffectiveUpgradeEffect,
+  resolveGameState,
+  resolveUpgradeSkillMultiplier,
+} from '@/application/useCases/game/stateMappers'
 import { BalanceResolver } from '@/domain/balance/services/balanceResolver'
 import { computeMoneyPerSecond, computePackagesPerSecond } from '@/domain/game/services/economy'
 
@@ -9,6 +13,9 @@ export interface UpgradeSnapshotDto {
   currentLevel: number
   nextLevel: number
   currentCost: number
+  skillMultiplier: number
+  baseCurrentEffect: number
+  baseNextEffect: number
   currentEffect: number
   nextEffect: number
   maxLevel?: number
@@ -52,6 +59,7 @@ export class GameViewModelResolver {
       cartMultiplier: resolved.runState.cartMultiplier,
       truckMultiplier: resolved.runState.truckMultiplier,
       tickRate: resolved.runState.tickRate,
+      cadenceThroughputMultiplier: resolved.runState.cadenceThroughputMultiplier,
     }).toNumber()
 
     const moneyPerSecond = computeMoneyPerSecond({
@@ -60,6 +68,7 @@ export class GameViewModelResolver {
       cartMultiplier: resolved.runState.cartMultiplier,
       truckMultiplier: resolved.runState.truckMultiplier,
       tickRate: resolved.runState.tickRate,
+      cadenceThroughputMultiplier: resolved.runState.cadenceThroughputMultiplier,
     })
 
     const upgrades: Record<string, UpgradeSnapshotDto> = {}
@@ -72,8 +81,31 @@ export class GameViewModelResolver {
         currentLevel,
         nextLevel: preview.nextLevel,
         currentCost: preview.currentCost,
-        currentEffect: preview.currentEffect,
-        nextEffect: preview.nextEffect,
+        skillMultiplier: resolveUpgradeSkillMultiplier(
+          upgrade.upgradeId,
+          state,
+          this.resolver,
+        ),
+        baseCurrentEffect: preview.currentEffect,
+        baseNextEffect: preview.nextEffect,
+        currentEffect: resolveEffectiveUpgradeEffect(
+          upgrade.upgradeId,
+          preview.currentEffect,
+          state,
+          this.resolver,
+        ),
+        nextEffect: resolveEffectiveUpgradeEffect(
+          upgrade.upgradeId,
+          preview.nextEffect,
+          {
+            ...state,
+            upgrades: {
+              ...state.upgrades,
+              [upgrade.upgradeId]: { level: preview.nextLevel },
+            },
+          },
+          this.resolver,
+        ),
         maxLevel: upgrade.maxLevel,
       }
     }
@@ -87,7 +119,7 @@ export class GameViewModelResolver {
       packages: floorToNonNegativeInteger(resolved.runState.packages),
       packagesPerSecond,
       moneyPerSecond,
-      employees: resolved.runState.employees,
+      employees: resolved.runState.ownedEmployees,
       warehouseCapacity: resolved.warehouseCapacity,
       tickDurationMs,
       nextWarehouseCost: this.resolver.resolveWarehouseCost(

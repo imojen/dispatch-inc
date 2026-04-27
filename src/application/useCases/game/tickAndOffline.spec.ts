@@ -88,7 +88,53 @@ describe('chapter 6 - tick/offline use-cases', () => {
     expect(faster.ok).toBe(true)
 
     if (base.ok && faster.ok) {
-      expect(faster.value.steps).toBeGreaterThan(base.value.steps)
+      expect(Number(faster.value.state.resources.money)).toBeGreaterThan(
+        Number(base.value.state.resources.money),
+      )
+    }
+  })
+
+  it('runTick applies base skill multipliers to production', async () => {
+    const balanceRepository = new LocalBalanceCatalogRepository()
+    const clock = new StubClock(Date.parse('2026-04-21T10:00:01.000Z'))
+    const runTick = createRunTickUseCase(balanceRepository, clock)
+
+    const base = await runTick({
+      state: createBaseState({
+        simulation: {
+          tickRate: '1',
+          lastSeenAt: '2026-04-21T10:00:00.000Z',
+        },
+      }),
+    })
+
+    const boosted = await runTick({
+      state: createBaseState({
+        simulation: {
+          tickRate: '1',
+          lastSeenAt: '2026-04-21T10:00:00.000Z',
+        },
+        skills: {
+          'offline.resilience': { level: 0 },
+          'staff.mastery': { level: 1 },
+          'scan.mastery': { level: 1 },
+          'conveyor.mastery': { level: 1 },
+          'sorting.mastery': { level: 1 },
+          'shipping.mastery': { level: 1 },
+        },
+      }),
+    })
+
+    expect(base.ok).toBe(true)
+    expect(boosted.ok).toBe(true)
+
+    if (base.ok && boosted.ok) {
+      expect(Number(boosted.value.state.resources.packages)).toBeGreaterThan(
+        Number(base.value.state.resources.packages),
+      )
+      expect(Number(boosted.value.state.resources.money)).toBeGreaterThan(
+        Number(base.value.state.resources.money),
+      )
     }
   })
 
@@ -141,5 +187,29 @@ describe('chapter 6 - tick/offline use-cases', () => {
 
     expect(result.value.report.countedOfflineDurationMs).toBe(6 * 60 * 60 * 1000)
     expect(Number(result.value.report.offlineMoneyGained)).toBeGreaterThan(10000)
+  })
+
+  it('applyOfflineProgress can bypass the default trigger for explicit idle rest resume', async () => {
+    const balanceRepository = new LocalBalanceCatalogRepository()
+    const clock = new StubClock(Date.parse('2026-04-21T10:00:10.000Z'))
+    const applyOfflineProgress = createApplyOfflineProgressUseCase(balanceRepository, clock)
+
+    const result = await applyOfflineProgress({
+      state: createBaseState({
+        simulation: {
+          tickRate: '1',
+          lastSeenAt: '2026-04-21T10:00:00.000Z',
+        },
+      }),
+      triggerAfterMsOverride: 0,
+    })
+
+    expect(result.ok).toBe(true)
+    if (!result.ok) {
+      return
+    }
+
+    expect(result.value.report.countedOfflineDurationMs).toBe(10_000)
+    expect(Number(result.value.report.offlineMoneyGained)).toBeGreaterThan(0)
   })
 })

@@ -11,7 +11,10 @@ describe('BalanceResolver', () => {
     const preview = resolver.getUpgradePreview('employees', 1)
 
     expect(costL1).toBeGreaterThan(10)
+    expect(Number.isInteger(costL1)).toBe(true)
     expect(effectL1).toBe(2)
+    expect(Number.isInteger(preview.currentCost)).toBe(true)
+    expect(Number.isInteger(preview.nextCost)).toBe(true)
     expect(preview.nextCost).toBeGreaterThan(preview.currentCost)
     expect(preview.nextEffect).toBeGreaterThan(preview.currentEffect)
   })
