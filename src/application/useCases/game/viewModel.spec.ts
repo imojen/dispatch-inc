@@ -29,6 +29,9 @@ function createBaseState(overrides?: Partial<GameStateDto>): GameStateDto {
       trucks: { level: 0 },
       ...(overrides?.upgrades ?? {}),
     },
+    runUnlocks: {
+      ...(overrides?.runUnlocks ?? {}),
+    },
     skills: {
       'offline.resilience': { level: 0 },
       ...(overrides?.skills ?? {}),

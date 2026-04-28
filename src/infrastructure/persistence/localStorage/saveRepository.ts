@@ -81,11 +81,15 @@ function normalizeSlotMetadata(input: unknown): SaveSlotMetadataDto | null {
     return null
   }
 
-  if (!Number.isInteger(version) || version < 1) {
+  if (typeof version !== 'number' || !Number.isInteger(version) || version < 1) {
     return null
   }
 
-  if (!Number.isInteger(balanceCatalogVersion) || balanceCatalogVersion < 1) {
+  if (
+    typeof balanceCatalogVersion !== 'number' ||
+    !Number.isInteger(balanceCatalogVersion) ||
+    balanceCatalogVersion < 1
+  ) {
     return null
   }
 

@@ -24,7 +24,7 @@ interface UiState {
   nextToastId: number
 }
 
-const toastTimers = new Map<number, number>()
+const toastTimers = new Map<number, ReturnType<typeof globalThis.setTimeout>>()
 
 function clearToastTimer(toastId: number): void {
   const timer = toastTimers.get(toastId)

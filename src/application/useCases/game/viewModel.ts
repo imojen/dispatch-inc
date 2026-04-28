@@ -48,8 +48,10 @@ function floorToNonNegativeInteger(value: number): number {
 export class GameViewModelResolver {
   private readonly resolver: BalanceResolver
   private readonly skillIds: Set<string>
+  private readonly catalog: BalanceCatalogDto
 
-  constructor(private readonly catalog: BalanceCatalogDto) {
+  constructor(catalog: BalanceCatalogDto) {
+    this.catalog = catalog
     this.resolver = new BalanceResolver(catalog)
     this.skillIds = new Set(catalog.skills.map((skill) => skill.upgradeId))
   }

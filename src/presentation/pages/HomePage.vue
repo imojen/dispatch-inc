@@ -205,18 +205,6 @@
                   {{ t('save.action.play') }}
                 </button>
                 <button
-                  class="button button-small button-icon"
-                  :disabled="saveMenu.isWorking"
-                  :aria-label="t('save.action.export')"
-                  :title="t('save.action.export')"
-                  @click="saveMenu.exportSlot(slot.id)"
-                >
-                  <i
-                    class="fa-solid fa-download"
-                    aria-hidden="true"
-                  />
-                </button>
-                <button
                   class="button button-small button-danger button-icon"
                   :disabled="saveMenu.isWorking"
                   :aria-label="t('save.action.delete')"
@@ -231,24 +219,6 @@
               </div>
             </li>
           </ul>
-
-          <div class="load-actions-row">
-            <button
-              class="button"
-              @click="openImportPicker"
-            >
-              {{ t('home.load.import') }}
-            </button>
-          </div>
-
-          <input
-            ref="importInputRef"
-            class="hidden-input"
-            type="file"
-            accept="application/json,.json"
-            @change="onImportFileSelected"
-          >
-
           <div
             v-if="saveMenu.pendingDeleteSlotId"
             class="confirm-box"
@@ -285,7 +255,6 @@ const saveMenu = useSaveMenuStore()
 const ui = useUiStore()
 const isCreateModalOpen = ref(false)
 const newRunLabel = ref('')
-const importInputRef = ref<{ click: () => void } | null>(null)
 
 const hasSaves = computed(() => saveMenu.slots.length > 0)
 const canCreateRun = computed(() => !saveMenu.isWorking && newRunLabel.value.trim().length > 0)
@@ -308,10 +277,6 @@ function slotClass(slotId: string): string {
   }
 
   return ''
-}
-
-function openImportPicker(): void {
-  importInputRef.value?.click()
 }
 
 function buildDefaultRunLabel(): string {
@@ -342,22 +307,6 @@ async function confirmCreateRun(): Promise<void> {
 
 async function onContinue(): Promise<void> {
   await saveMenu.continueLatest()
-}
-
-async function onImportFileSelected(event: { target: unknown }): Promise<void> {
-  const target = event.target as
-    | { files?: { [index: number]: unknown }; value?: string }
-    | null
-  const file = target?.files?.[0]
-
-  if (!file || typeof file !== 'object' || !('text' in file)) {
-    return
-  }
-
-  await saveMenu.importFromFile(file as { text: () => Promise<string> })
-  if (target) {
-    target.value = ''
-  }
 }
 
 onMounted(async () => {

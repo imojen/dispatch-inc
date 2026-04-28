@@ -21,7 +21,7 @@ export class BalanceResolver {
   private readonly skillMap: Map<string, UpgradeBalanceDto>
   private readonly warehouseMap: Map<string, UpgradeBalanceDto>
 
-  constructor(private readonly catalog: BalanceCatalogDto) {
+  constructor(catalog: BalanceCatalogDto) {
     this.scaleMap = new Map(catalog.scales.map((scale) => [scale.id, scale]))
     this.upgradeMap = new Map(catalog.upgrades.map((upgrade) => [upgrade.upgradeId, upgrade]))
     this.skillMap = new Map(catalog.skills.map((skill) => [skill.upgradeId, skill]))

@@ -8,7 +8,11 @@ import { BalanceResolver } from '@/domain/balance/services/balanceResolver'
 import { LocalBalanceCatalogRepository } from '@/infrastructure/balance/catalog/localCatalog'
 
 class StubClock {
-  constructor(private currentMs: number) {}
+  private currentMs: number
+
+  constructor(currentMs: number) {
+    this.currentMs = currentMs
+  }
 
   nowMs(): number {
     return this.currentMs
@@ -40,6 +44,9 @@ function createBaseState(overrides?: Partial<GameStateDto>): GameStateDto {
       carts: { level: 0 },
       trucks: { level: 0 },
       ...(overrides?.upgrades ?? {}),
+    },
+    runUnlocks: {
+      ...(overrides?.runUnlocks ?? {}),
     },
     skills: {
       'offline.resilience': { level: 0 },

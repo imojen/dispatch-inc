@@ -10,7 +10,11 @@ import { WAREHOUSE_RESET_STARTING_MONEY } from '@/domain/game/services/reset'
 import { LocalBalanceCatalogRepository } from '@/infrastructure/balance/catalog/localCatalog'
 
 class StubClock {
-  constructor(private currentMs: number) {}
+  private currentMs: number
+
+  constructor(currentMs: number) {
+    this.currentMs = currentMs
+  }
 
   nowMs(): number {
     return this.currentMs

@@ -33,10 +33,3 @@ npm run test
 ```
 
 If command names differ in this repo, use the equivalent lint and test commands.
-
-## Global plan tracking (mandatory)
-
-- `GLOBAL_PLAN.md` is the execution source of truth for implementation progress.
-- After each meaningful progress step, check whether one or more plan checkboxes can be marked done.
-- Update checkbox states immediately so the plan always reflects reality.
-- Never mark a checkbox as done without concrete implementation evidence (code/tests/docs update).

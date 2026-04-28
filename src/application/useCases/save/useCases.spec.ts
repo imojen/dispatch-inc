@@ -43,7 +43,11 @@ function createMemoryStorageHarness(): MemoryStorageHarness {
 }
 
 class StubClock {
-  constructor(private currentMs: number) {}
+  private currentMs: number
+
+  constructor(currentMs: number) {
+    this.currentMs = currentMs
+  }
 
   nowMs(): number {
     return this.currentMs

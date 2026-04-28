@@ -58,6 +58,7 @@ function createSlot(id: string, lastPlayedAt: string): SaveSlotDto {
         architecturePoints: 0,
         skillPoints: 0,
       },
+      runUnlocks: {},
       upgrades: {},
       skills: {},
     },

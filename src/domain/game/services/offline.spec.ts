@@ -16,6 +16,7 @@ const state: GameRunState = {
   cartMultiplier: 1,
   truckMultiplier: 1,
   tickRate: 1,
+  cadenceThroughputMultiplier: 1,
   warehouseLevel: 1,
   skillPoints: 0,
   upgrades: {},

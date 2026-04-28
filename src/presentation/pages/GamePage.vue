@@ -900,15 +900,15 @@ const warehouseAsciiArt = String.raw`
  ||____|| 
 `;
 
-let tickTimer: number | undefined;
-let autosaveTimer: number | undefined;
-let idleRestTimer: number | undefined;
+let tickTimer: ReturnType<typeof globalThis.setTimeout> | undefined;
+let autosaveTimer: ReturnType<typeof globalThis.setInterval> | undefined;
+let idleRestTimer: ReturnType<typeof globalThis.setTimeout> | undefined;
 let tickInFlight = false;
 let autosaveInFlight = false;
 let offlineSyncInFlight = false;
 let lastTickErrorToastAt = 0;
 let lastAutosaveErrorToastAt = 0;
-let devCheatHoldTimer: number | undefined;
+let devCheatHoldTimer: ReturnType<typeof globalThis.setTimeout> | undefined;
 const pressedDevCheatKeys = new Set<string>();
 
 const gameViewResolver = computed(() => {
@@ -1072,12 +1072,16 @@ const hiddenBranchUnlocked = computed(() => {
 });
 
 const upgradeCards = computed<UpgradeCardVm[]>(() => {
-  if (!game.current || !gameSnapshot.value) {
+  const currentState = game.current;
+  const snapshotState = gameSnapshot.value;
+  const resolver = gameViewResolver.value;
+
+  if (!currentState || !snapshotState || !resolver) {
     return [];
   }
 
   return UPGRADE_DEFINITIONS.map((definition) => {
-    const snapshot = gameSnapshot.value?.upgrades[definition.id];
+    const snapshot = snapshotState.upgrades[definition.id];
     if (!snapshot) {
       return {
         ...definition,
@@ -1113,18 +1117,18 @@ const upgradeCards = computed<UpgradeCardVm[]>(() => {
     const canUnlock = !isUnlocked && hasEnoughMoneyToUnlock;
     const canBuy =
       isUnlocked && !isMaxLevel && hasEnoughMoney && !isEmployeesAtCapacity;
-    const previewSnapshot = gameViewResolver.value?.createSnapshot({
-      ...game.current,
+    const previewSnapshot = resolver.createSnapshot({
+      ...currentState,
       upgrades: {
-        ...game.current.upgrades,
+        ...currentState.upgrades,
         [definition.id]: { level: snapshot.nextLevel },
       },
     });
     const deltaPackagesPerSecond = previewSnapshot
-      ? previewSnapshot.packagesPerSecond - gameSnapshot.value.packagesPerSecond
+      ? previewSnapshot.packagesPerSecond - snapshotState.packagesPerSecond
       : 0;
     const deltaMoneyPerSecond = previewSnapshot
-      ? previewSnapshot.moneyPerSecond - gameSnapshot.value.moneyPerSecond
+      ? previewSnapshot.moneyPerSecond - snapshotState.moneyPerSecond
       : 0;
 
     let reasonKey: string | undefined;

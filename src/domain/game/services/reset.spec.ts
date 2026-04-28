@@ -16,6 +16,7 @@ describe('reset service', () => {
       cartMultiplier: 2,
       truckMultiplier: 2,
       tickRate: 1,
+      cadenceThroughputMultiplier: 1,
       warehouseLevel: 2,
       skillPoints: 3,
       upgrades: { employees: { level: 4 } },
