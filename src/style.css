@@ -443,6 +443,17 @@ select {
   line-height: 1;
 }
 
+.button-icon::before,
+.button-icon:hover::before,
+.button-icon:focus-visible::before,
+.button-icon:active::before,
+.button-icon::after,
+.button-icon:hover::after,
+.button-icon:focus-visible::after,
+.button-icon:active::after {
+  content: none !important;
+}
+
 .hidden-input {
   display: none;
 }
@@ -1008,6 +1019,50 @@ select {
   align-items: stretch;
 }
 
+.warehouse-goal-panel {
+  display: grid;
+  gap: 1rem;
+  align-content: center;
+  justify-items: start;
+  min-height: 100%;
+  padding: 2rem 0.75rem;
+}
+
+.warehouse-goal-kicker,
+.warehouse-goal-title,
+.warehouse-goal-copy {
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.warehouse-goal-kicker {
+  color: #1f8f4f;
+  letter-spacing: 0.12em;
+}
+
+.warehouse-goal-title {
+  color: #3cff7a;
+  font-size: 1.35rem;
+  line-height: 1.25;
+}
+
+.warehouse-goal-copy {
+  max-width: 44rem;
+  color: #8fffaf;
+  line-height: 1.5;
+}
+
+.warehouse-goal-copy-strong {
+  color: #3cff7a;
+}
+
+.warehouse-goal-action {
+  width: auto;
+  min-width: 0;
+  padding-left: 0;
+  font-size: 1rem;
+}
+
 .game-resource-chip {
   margin: 0;
   border: 0;
@@ -1294,14 +1349,14 @@ select {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
   align-items: start;
-  gap: 0.8rem;
+  gap: 0.95rem;
 }
 
 .skill-branch-header i {
-  font-size: 1.15rem;
+  font-size: 1.35rem;
   margin-top: 0;
   align-self: start;
-  padding-top: 0.08rem;
+  padding-top: 0.04rem;
 }
 
 .skill-branch-content {
@@ -1342,8 +1397,8 @@ select {
 .skill-branch-meta,
 .skill-branch-state {
   margin: 0;
-  font-size: 0.78rem;
-  line-height: 1.28;
+  font-size: 0.88rem;
+  line-height: 1.34;
 }
 
 .skill-level-track {
@@ -1378,6 +1433,16 @@ select {
   box-shadow: 2px 2px 0 #202832;
 }
 
+.game-shell .skill-branch-plus.button-small.button-icon:hover::before,
+.game-shell .skill-branch-plus.button-small.button-icon:focus-visible::before {
+  content: none;
+}
+
+.game-shell .button-icon:hover::before,
+.game-shell .button-icon:focus-visible::before {
+  content: none;
+}
+
 .skill-branch-state {
   color: #824816;
   font-weight: 700;
@@ -1404,6 +1469,53 @@ select {
   font-weight: 700;
 }
 
+.reset-recap-copy {
+  margin: 0 0 0.9rem;
+  color: #8fffaf;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+
+.reset-recap-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.9rem;
+  margin-bottom: 0.9rem;
+}
+
+.reset-recap-block {
+  display: grid;
+  gap: 0.3rem;
+  padding: 0.8rem 0.9rem;
+  border: 1px dashed rgba(60, 255, 122, 0.35);
+  background: rgba(8, 24, 12, 0.5);
+}
+
+.reset-recap-label,
+.reset-recap-meta,
+.reset-recap-reward {
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.reset-recap-label {
+  color: #1f8f4f;
+  letter-spacing: 0.08em;
+}
+
+.reset-recap-meta {
+  color: #8fffaf;
+}
+
+.reset-recap-value-inline {
+  margin-top: 0.2rem;
+}
+
+.reset-recap-reward {
+  margin-top: 0.9rem;
+  color: #3cff7a;
+}
+
 .offline-key-value {
   margin: 0;
   display: flex;
@@ -1414,6 +1526,17 @@ select {
 
 .offline-key-value strong {
   font-size: 1rem;
+}
+
+.offline-key-value-loss,
+.offline-key-value-loss strong {
+  color: #ff5f3c;
+}
+
+.offline-key-value-loss span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
 }
 
 @keyframes package-move {
@@ -1865,6 +1988,12 @@ select {
   box-shadow: none !important;
 }
 
+.warehouse-goal-panel .warehouse-goal-action {
+  width: auto;
+  min-width: 0;
+  justify-self: start;
+}
+
 .warehouse-stage-action-bracket {
   color: #3cff7a;
   text-shadow: 0 0 6px rgba(60, 255, 122, 0.2);
@@ -1893,24 +2022,25 @@ select {
 
 .game-resource-chip {
   display: grid;
-  grid-template-rows: auto 1fr auto;
+  grid-template-rows: auto auto;
   align-content: start;
-  gap: 0.55rem;
+  gap: 0.35rem;
   border-right: 1px solid rgba(60, 255, 122, 0.24);
   box-shadow: none;
   background: transparent;
-  padding: 0.8rem 1rem 0.65rem;
+  padding: 0.7rem 1rem 0.6rem;
 }
 
 .game-resource-chip:last-child {
   border-right: 0;
 }
 
-.game-resource-head {
+.game-resource-topline {
   display: grid;
-  grid-template-columns: auto 1fr;
-  align-items: start;
-  gap: 0.65rem;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 2.1rem;
 }
 
 .game-resource-copy {
@@ -1929,9 +2059,10 @@ select {
   margin: 0;
   color: #3cff7a;
   font-size: 0.96rem;
-  line-height: 1;
+  line-height: 1.1;
   letter-spacing: 0.05em;
   text-transform: uppercase;
+  align-self: center;
 }
 
 .game-resource-label {
@@ -1942,20 +2073,32 @@ select {
 }
 
 .game-resource-value {
+  margin: 0;
   color: #3cff7a;
   font-size: clamp(1.55rem, 2vw, 2.15rem);
-  line-height: 1;
+  line-height: 1.1;
+  text-align: right;
+  align-self: center;
   text-shadow: 0 0 10px rgba(60, 255, 122, 0.26);
 }
 
 .game-resource-subvalue {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.75rem;
   color: #3cff7a;
   font-size: 0.84rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  margin-top: 0.55rem;
-  padding-top: 0.7rem;
+  margin-top: 0.3rem;
+  padding-top: 0.45rem;
   border-top: 1px dashed rgba(60, 255, 122, 0.34);
+}
+
+.game-resource-subvalue strong {
+  font-weight: 700;
+  text-align: right;
 }
 
 .terminal-upgrade-list {
@@ -2137,6 +2280,13 @@ select {
   margin-bottom: 0.25rem;
 }
 
+.warehouse-hotspot-impact {
+  margin-left: 0.5rem;
+  color: rgba(143, 255, 175, 0.72);
+  font-size: 0.88em;
+  white-space: nowrap;
+}
+
 .warehouse-hotspot-warning,
 .terminal-upgrade-status-ko {
   color: #5f3428;
@@ -2230,14 +2380,68 @@ select {
   text-align: center;
   text-transform: uppercase;
   letter-spacing: 0.08em;
+  line-height: 1.2;
   text-shadow:
     0 0 6px rgba(60, 255, 122, 0.7),
     0 0 14px rgba(60, 255, 122, 0.25);
 }
 
+.game-shell .idle-rest-copy {
+  margin: 0;
+  max-width: 28rem;
+  color: rgba(143, 255, 175, 0.88);
+  text-align: center;
+  line-height: 1.5;
+}
+
 .game-shell .idle-rest-modal .confirm-actions {
   width: 100%;
   justify-content: center;
+}
+
+.game-shell .welcome-briefing-modal {
+  display: grid;
+  gap: 1rem;
+}
+
+.welcome-briefing-intro {
+  margin: 0;
+  color: rgba(143, 255, 175, 0.92);
+  line-height: 1.55;
+}
+
+.welcome-briefing-steps {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.welcome-briefing-step {
+  margin: 0;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.7rem;
+  align-items: start;
+  color: #3cff7a;
+  line-height: 1.5;
+}
+
+.welcome-briefing-step-index {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2rem;
+  padding-top: 0.02rem;
+  color: #020403;
+  background: #3cff7a;
+}
+
+.welcome-briefing-hint {
+  margin: 0;
+  padding: 0.75rem 0.9rem;
+  border: 1px dashed rgba(60, 255, 122, 0.45);
+  background: rgba(12, 28, 17, 0.58);
+  color: #8fffaf;
+  line-height: 1.45;
 }
 
 .game-shell .overlay > .overlay-card:not(.overlay-card-large) {
@@ -2362,6 +2566,11 @@ select {
 .offline-key-value,
 .offline-key-value strong {
   color: #3cff7a;
+}
+
+.offline-key-value-loss,
+.offline-key-value-loss strong {
+  color: #ff5f3c;
 }
 
 .skill-branch-state {
@@ -3176,5 +3385,43 @@ select {
   .home-terminal-footer-block p,
   .home-terminal-tagline {
     font-size: 0.82rem;
+  }
+}
+.offline-report-hint {
+  margin: 1rem 0 0;
+  padding: 0.75rem 0.9rem;
+  border: 1px dashed rgba(60, 255, 122, 0.45);
+  background: rgba(12, 28, 17, 0.58);
+  color: #8fffaf;
+  line-height: 1.45;
+}
+
+.offline-report-hint-label {
+  display: inline-block;
+  margin-right: 0.5rem;
+  color: #3cff7a;
+}
+
+.offline-summary-modal .popup-title {
+  max-width: calc(100% - 3.2rem);
+  white-space: normal;
+}
+
+.offline-report-intro {
+  margin: 0 0 0.2rem;
+  color: rgba(143, 255, 175, 0.88);
+  line-height: 1.45;
+}
+
+@media (max-width: 640px) {
+  .offline-key-value {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+
+  .offline-key-value strong {
+    align-self: flex-end;
+    text-align: right;
   }
 }

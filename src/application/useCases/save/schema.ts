@@ -1,4 +1,4 @@
-import type { GameStateDto, LevelStateDto } from '@/application/dto/game'
+import type { GameStateDto, LevelStateDto, UnlockStateDto } from '@/application/dto/game'
 import type { SaveIndexDto, SaveSlotDto, SaveSlotMetadataDto } from '@/application/dto/save'
 
 const NUMERIC_STRING_REGEX = /^-?(?:\d+|\d*\.\d+)(?:[eE][+-]?\d+)?$/
@@ -79,6 +79,25 @@ function parseLevelStateRecord(value: unknown, path: string): Record<string, Lev
   }, {})
 }
 
+function parseUnlockStateRecord(
+  value: unknown,
+  path: string,
+): Record<string, UnlockStateDto> {
+  const record = assertRecord(value, path)
+  const entries = Object.entries(record)
+
+  return entries.reduce<Record<string, UnlockStateDto>>((acc, [key, entry]) => {
+    const entryRecord = assertRecord(entry, `${path}.${key}`)
+    if (typeof entryRecord.unlocked !== 'boolean') {
+      throw new SaveSchemaValidationError(`${path}.${key}.unlocked must be a boolean`)
+    }
+    acc[key] = {
+      unlocked: entryRecord.unlocked,
+    }
+    return acc
+  }, {})
+}
+
 export class SaveSchemaValidationError extends Error {
   constructor(message: string) {
     super(message)
@@ -117,6 +136,10 @@ export function parseGameStateStrict(input: unknown): GameStateDto {
       skillPoints: assertInteger(progression.skillPoints, 'save.data.progression.skillPoints', 0),
     },
     upgrades: parseLevelStateRecord(root.upgrades, 'save.data.upgrades'),
+    runUnlocks:
+      root.runUnlocks === undefined
+        ? {}
+        : parseUnlockStateRecord(root.runUnlocks, 'save.data.runUnlocks'),
     skills: parseLevelStateRecord(root.skills, 'save.data.skills'),
   }
 }

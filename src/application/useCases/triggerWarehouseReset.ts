@@ -10,7 +10,10 @@ import { resolveGameState } from '@/application/useCases/game/stateMappers'
 import { parseGameStateStrict } from '@/application/useCases/save/schema'
 import { BalanceResolver } from '@/domain/balance/services/balanceResolver'
 import { canUnlockNextWarehouse } from '@/domain/game/policies/WarehouseUnlockPolicy'
-import { applyWarehouseReset } from '@/domain/game/services/reset'
+import {
+  applyWarehouseReset,
+  WAREHOUSE_RESET_STARTING_MONEY,
+} from '@/domain/game/services/reset'
 
 export interface TriggerWarehouseResetInput {
   state: GameStateDto
@@ -18,8 +21,12 @@ export interface TriggerWarehouseResetInput {
 
 export interface TriggerWarehouseResetOutput {
   state: GameStateDto
-  spentMoney: number
+  completedWarehouseLevel: number
+  requiredPackages: number
   nextWarehouseLevel: number
+  nextWarehouseCapacity: number
+  nextWarehousePackagesRequired: number
+  restartMoney: number
 }
 
 export type TriggerWarehouseReset = (
@@ -44,15 +51,20 @@ export function createTriggerWarehouseResetUseCase(
       const resolver = new BalanceResolver(catalog)
       const resolved = resolveGameState(state, resolver)
 
-      const resolvedWarehouseCost = resolver.resolveWarehouseCost(
+      const resolvedWarehouseRequirement = resolver.resolveWarehouseRequirement(
         'warehouse.progression',
         state.progression.warehouseLevel,
       )
 
-      if (!canUnlockNextWarehouse(resolved.runState.money, resolvedWarehouseCost)) {
+      if (
+        !canUnlockNextWarehouse(
+          resolved.runState.packages,
+          resolvedWarehouseRequirement,
+        )
+      ) {
         return gameFailure(
-          'INSUFFICIENT_FUNDS',
-          `Insufficient funds for warehouse reset: required ${resolvedWarehouseCost}, current ${resolved.runState.money}.`,
+          'INSUFFICIENT_PACKAGES',
+          `Insufficient packages for warehouse reset: required ${resolvedWarehouseRequirement}, current ${resolved.runState.packages}.`,
         )
       }
 
@@ -76,12 +88,21 @@ export function createTriggerWarehouseResetUseCase(
           skillPoints: resetRunState.skillPoints,
         },
         upgrades: {},
+        runUnlocks: {},
       }
+      const resolvedNextState = resolveGameState(nextState, resolver)
 
       return gameSuccess({
         state: nextState,
-        spentMoney: resolvedWarehouseCost,
+        completedWarehouseLevel: state.progression.warehouseLevel,
+        requiredPackages: resolvedWarehouseRequirement,
         nextWarehouseLevel,
+        nextWarehouseCapacity: resolvedNextState.warehouseCapacity,
+        nextWarehousePackagesRequired: resolver.resolveWarehouseRequirement(
+          'warehouse.progression',
+          nextWarehouseLevel,
+        ),
+        restartMoney: WAREHOUSE_RESET_STARTING_MONEY,
       })
     } catch (error) {
       return gameFailure('SAVE_WRITE_FAILED', 'Unable to trigger warehouse reset.', error)

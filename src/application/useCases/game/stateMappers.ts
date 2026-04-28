@@ -1,4 +1,9 @@
-import type { GameStateDto, LevelStateDto, OfflineReportDto } from '@/application/dto/game'
+import type {
+  GameStateDto,
+  LevelStateDto,
+  OfflineReportDto,
+  UnlockStateDto,
+} from '@/application/dto/game'
 import type { BalanceResolver } from '@/domain/balance/services/balanceResolver'
 import type { GameRunState, OfflinePolicy } from '@/domain/game/entities/GameRunState'
 import { OFFLINE_BASE_POLICY } from '@/domain/game/services/offline'
@@ -78,6 +83,28 @@ export function setLevel(
   return {
     ...record,
     [id]: { level },
+  }
+}
+
+export function isUpgradeUnlocked(
+  record: Record<string, UnlockStateDto> | undefined,
+  upgradeId: string,
+): boolean {
+  return upgradeId === 'employees' || record?.[upgradeId]?.unlocked === true
+}
+
+export function setUpgradeUnlocked(
+  record: Record<string, UnlockStateDto>,
+  upgradeId: string,
+  unlocked: boolean,
+): Record<string, UnlockStateDto> {
+  if (upgradeId === 'employees') {
+    return record
+  }
+
+  return {
+    ...record,
+    [upgradeId]: { unlocked },
   }
 }
 

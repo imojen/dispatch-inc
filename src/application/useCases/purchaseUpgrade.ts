@@ -8,6 +8,7 @@ import {
 import {
   getLevel,
   getMoneyAsNumber,
+  isUpgradeUnlocked,
   resolveGameState,
   setLevel,
   setMoney,
@@ -53,6 +54,13 @@ export function createPurchaseUpgradeUseCase(
 
       const resolver = new BalanceResolver(catalog)
       const currentLevel = getLevel(state.upgrades, input.upgradeId)
+
+      if (!isUpgradeUnlocked(state.runUnlocks, input.upgradeId)) {
+        return gameFailure(
+          'UPGRADE_LOCKED',
+          `Upgrade ${input.upgradeId} must be unlocked before purchase.`,
+        )
+      }
 
       if (entry.maxLevel !== undefined && currentLevel >= entry.maxLevel) {
         return gameFailure('MAX_LEVEL_REACHED', `Max level reached for ${input.upgradeId}.`)

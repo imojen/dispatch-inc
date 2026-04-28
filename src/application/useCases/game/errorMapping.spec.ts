@@ -9,6 +9,7 @@ describe('chapter 6 - game error mapping', () => {
       'UNKNOWN_SKILL',
       'MAX_LEVEL_REACHED',
       'INSUFFICIENT_FUNDS',
+      'INSUFFICIENT_PACKAGES',
       'CAPACITY_REACHED',
       'SAVE_SCHEMA_INVALID',
       'SAVE_WRITE_FAILED',

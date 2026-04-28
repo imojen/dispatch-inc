@@ -11,6 +11,10 @@ import {
   offlineRewardToDto,
   resolveGameState,
 } from '@/application/useCases/game/stateMappers'
+import {
+  clampRunStateToWarehouseGoal,
+  hasReachedWarehouseGoal,
+} from '@/application/useCases/game/warehouseGoal'
 import { parseGameStateStrict } from '@/application/useCases/save/schema'
 import { BalanceResolver } from '@/domain/balance/services/balanceResolver'
 import { computeOfflineRewardedDurationMs } from '@/domain/game/services/offline'
@@ -40,14 +44,25 @@ function replayOfflineRewardsInChunks(input: {
   state: ReturnType<typeof resolveGameState>['runState']
   countedDurationMs: number
   efficiencyMultiplier: number
+  requiredPackages: number
 }): {
   moneyGained: number
   packagesDispatched: number
+  productiveDurationMs: number
 } {
   let remainingMs = input.countedDurationMs
   let moneyGained = 0
   let packagesDispatched = 0
+  let productiveDurationMs = 0
   let replayState = input.state
+
+  if (hasReachedWarehouseGoal(replayState.packages, input.requiredPackages)) {
+    return {
+      moneyGained: 0,
+      packagesDispatched: 0,
+      productiveDurationMs: 0,
+    }
+  }
 
   while (remainingMs > 0) {
     const chunkMs = Math.min(remainingMs, OFFLINE_REPLAY_CHUNK_MS)
@@ -57,20 +72,31 @@ function replayOfflineRewardsInChunks(input: {
       state: replayState,
       deltaSeconds: chunkSeconds,
     })
+    const clamped = clampRunStateToWarehouseGoal({
+      previousState: replayState,
+      nextState,
+      requiredPackages: input.requiredPackages,
+    })
 
-    const deltaMoney = nextState.money - replayState.money
-    const deltaPackages = nextState.packages - replayState.packages
+    const deltaMoney = clamped.state.money - replayState.money
+    const deltaPackages = clamped.state.packages - replayState.packages
 
     moneyGained += deltaMoney * input.efficiencyMultiplier
     packagesDispatched += deltaPackages * input.efficiencyMultiplier
+    productiveDurationMs += chunkMs * clamped.appliedRatio
 
-    replayState = nextState
+    replayState = clamped.state
     remainingMs -= chunkMs
+
+    if (clamped.reachedGoal) {
+      break
+    }
   }
 
   return {
     moneyGained,
     packagesDispatched,
+    productiveDurationMs,
   }
 }
 
@@ -119,10 +145,14 @@ export function createApplyOfflineProgressUseCase(
         state: resolved.runState,
         countedDurationMs,
         efficiencyMultiplier: resolved.offlinePolicy.efficiencyMultiplier,
+        requiredPackages: resolver.resolveWarehouseRequirement(
+          'warehouse.progression',
+          state.progression.warehouseLevel,
+        ),
       })
 
       const report = offlineRewardToDto({
-        countedOfflineDurationMs: countedDurationMs,
+        countedOfflineDurationMs: replayed.productiveDurationMs,
         moneyGained: replayed.moneyGained,
         packagesDispatched: replayed.packagesDispatched,
       })

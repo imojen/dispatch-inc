@@ -10,11 +10,15 @@ import {
   applyRunStateToGameState,
   resolveGameState,
 } from '@/application/useCases/game/stateMappers'
+import {
+  clampRunStateToWarehouseGoal,
+  hasReachedWarehouseGoal,
+} from '@/application/useCases/game/warehouseGoal'
 import { parseGameStateStrict } from '@/application/useCases/save/schema'
 import { BalanceResolver } from '@/domain/balance/services/balanceResolver'
 import { applyTick } from '@/domain/game/services/tick'
 
-const MAX_DELTA_TIME_MS = 250
+const MAX_DELTA_TIME_MS = 5000
 const MAX_INTERNAL_STEPS = 500
 
 export interface RunTickInput {
@@ -69,6 +73,30 @@ export function createRunTickUseCase(
       const rawDeltaTimeMs = input.deltaTimeMs ?? nowMs - lastSeenMs
       const usedDeltaTimeMs = clampDeltaTimeMs(rawDeltaTimeMs)
       const tickDurationSeconds = toTickDurationSeconds(resolved.runState.tickRate)
+      const warehousePackagesRequired = resolver.resolveWarehouseRequirement(
+        'warehouse.progression',
+        state.progression.warehouseLevel,
+      )
+
+      if (
+        hasReachedWarehouseGoal(
+          resolved.runState.packages,
+          warehousePackagesRequired,
+        )
+      ) {
+        return gameSuccess({
+          state: applyRunStateToGameState(
+            state,
+            {
+              ...resolved.runState,
+              packages: warehousePackagesRequired,
+            },
+            new Date(nowMs).toISOString(),
+          ),
+          usedDeltaTimeMs,
+          steps: 0,
+        })
+      }
 
       let remainingSeconds = usedDeltaTimeMs / 1000
       let steps = 0
@@ -76,16 +104,35 @@ export function createRunTickUseCase(
 
       while (remainingSeconds > 0 && steps < MAX_INTERNAL_STEPS) {
         const chunkSeconds = Math.min(remainingSeconds, tickDurationSeconds)
-        runState = applyTick({
+        const nextRunState = applyTick({
           state: runState,
           deltaSeconds: chunkSeconds,
         })
+        const clamped = clampRunStateToWarehouseGoal({
+          previousState: runState,
+          nextState: nextRunState,
+          requiredPackages: warehousePackagesRequired,
+        })
+        runState = clamped.state
         remainingSeconds -= chunkSeconds
         steps += 1
+
+        if (clamped.reachedGoal) {
+          remainingSeconds = 0
+          break
+        }
       }
 
       if (remainingSeconds > 0) {
-        runState = applyTick({ state: runState, deltaSeconds: remainingSeconds })
+        const nextRunState = applyTick({
+          state: runState,
+          deltaSeconds: remainingSeconds,
+        })
+        runState = clampRunStateToWarehouseGoal({
+          previousState: runState,
+          nextState: nextRunState,
+          requiredPackages: warehousePackagesRequired,
+        }).state
         steps += 1
       }
 

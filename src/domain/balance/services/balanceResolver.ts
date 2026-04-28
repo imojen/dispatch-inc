@@ -10,6 +10,7 @@ export interface UpgradePreview {
   nextLevel: number
   currentCost: number
   nextCost: number
+  unlockCost?: number
   currentEffect: number
   nextEffect: number
 }
@@ -39,6 +40,16 @@ export class BalanceResolver {
     return evaluateScale(scale, level)
   }
 
+  resolveUpgradeUnlockCost(upgradeId: string): number | null {
+    const entry = this.requireUpgrade(upgradeId)
+    if (!entry.unlockCostScaleId) {
+      return null
+    }
+
+    const scale = this.requireScale(entry.unlockCostScaleId)
+    return Math.max(0, Math.floor(evaluateScale(scale, 0)))
+  }
+
   resolveSkillCost(skillId: string, level: number): number {
     const entry = this.requireSkill(skillId)
     const scale = this.requireScale(entry.costScaleId)
@@ -51,10 +62,10 @@ export class BalanceResolver {
     return evaluateScale(scale, level)
   }
 
-  resolveWarehouseCost(warehouseId: string, level: number): number {
+  resolveWarehouseRequirement(warehouseId: string, level: number): number {
     const entry = this.requireWarehouse(warehouseId)
     const scale = this.requireScale(entry.costScaleId)
-    return evaluateScale(scale, level)
+    return Math.max(0, Math.floor(evaluateScale(scale, level)))
   }
 
   resolveWarehouseEffect(warehouseId: string, level: number): number {
@@ -74,6 +85,7 @@ export class BalanceResolver {
       nextLevel: currentLevel + 1,
       currentCost: this.resolveUpgradeCost(upgradeId, currentLevel),
       nextCost: this.resolveUpgradeCost(upgradeId, currentLevel + 1),
+      unlockCost: this.resolveUpgradeUnlockCost(upgradeId) ?? undefined,
       currentEffect: this.resolveUpgradeEffect(upgradeId, currentLevel),
       nextEffect: this.resolveUpgradeEffect(upgradeId, currentLevel + 1),
     }

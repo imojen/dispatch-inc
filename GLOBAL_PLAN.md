@@ -603,7 +603,7 @@ Directory assets/ contient :
 - [ ] multi-save stable.
 - [ ] import/export stable.
 - [ ] offline progress stable.
-- [ ] balance data-driven stable.
+- [x] balance data-driven stable.
 
 ## 14.2 Documentation finalisation
 

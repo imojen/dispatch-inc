@@ -2,7 +2,10 @@ import { describe, expect, it } from 'vitest'
 import type { GameStateDto } from '@/application/dto/game'
 import { createPurchaseUpgradeUseCase } from '@/application/useCases/purchaseUpgrade'
 import { createTriggerWarehouseResetUseCase } from '@/application/useCases/triggerWarehouseReset'
+import { createUnlockUpgradeUseCase } from '@/application/useCases/unlockUpgrade'
 import { createUnlockSkillUseCase } from '@/application/useCases/unlockSkill'
+import { balanceCatalogV1 } from '@/data/balance/catalog.v1'
+import { BalanceResolver } from '@/domain/balance/services/balanceResolver'
 import { WAREHOUSE_RESET_STARTING_MONEY } from '@/domain/game/services/reset'
 import { LocalBalanceCatalogRepository } from '@/infrastructure/balance/catalog/localCatalog'
 
@@ -40,6 +43,9 @@ function createBaseState(overrides?: Partial<GameStateDto>): GameStateDto {
       trucks: { level: 0 },
       ...(overrides?.upgrades ?? {}),
     },
+    runUnlocks: {
+      ...(overrides?.runUnlocks ?? {}),
+    },
     skills: {
       'offline.resilience': { level: 0 },
       ...(overrides?.skills ?? {}),
@@ -67,6 +73,21 @@ describe('chapter 6 - progression use-cases', () => {
     expect(Number(result.value.state.resources.money)).toBeLessThan(5000)
   })
 
+  it('purchaseUpgrade rejects locked upgrades before run unlock', async () => {
+    const repository = new LocalBalanceCatalogRepository()
+    const purchaseUpgrade = createPurchaseUpgradeUseCase(repository)
+
+    const result = await purchaseUpgrade({
+      state: createBaseState(),
+      upgradeId: 'scanners',
+    })
+
+    expect(result.ok).toBe(false)
+    if (!result.ok) {
+      expect(result.error.code).toBe('UPGRADE_LOCKED')
+    }
+  })
+
   it('purchaseUpgrade rejects when funds are insufficient', async () => {
     const repository = new LocalBalanceCatalogRepository()
     const purchaseUpgrade = createPurchaseUpgradeUseCase(repository)
@@ -88,6 +109,10 @@ describe('chapter 6 - progression use-cases', () => {
 
     const result = await purchaseUpgrade({
       state: createBaseState({
+        resources: {
+          money: '1000000000',
+          packages: '0',
+        },
         upgrades: {
           employees: { level: 10 },
           scanners: { level: 0 },
@@ -111,6 +136,10 @@ describe('chapter 6 - progression use-cases', () => {
 
     const result = await purchaseUpgrade({
       state: createBaseState({
+        resources: {
+          money: '1000000000',
+          packages: '0',
+        },
         upgrades: {
           employees: { level: 10 },
           scanners: { level: 0 },
@@ -130,6 +159,32 @@ describe('chapter 6 - progression use-cases', () => {
     if (result.ok) {
       expect(result.value.state.upgrades.employees.level).toBe(11)
     }
+  })
+
+  it('unlockUpgrade consumes money and opens the upgrade for the current run', async () => {
+    const repository = new LocalBalanceCatalogRepository()
+    const unlockUpgrade = createUnlockUpgradeUseCase(repository)
+    const purchaseUpgrade = createPurchaseUpgradeUseCase(repository)
+
+    const unlocked = await unlockUpgrade({
+      state: createBaseState(),
+      upgradeId: 'scanners',
+    })
+
+    expect(unlocked.ok).toBe(true)
+    if (!unlocked.ok) {
+      return
+    }
+
+    expect(unlocked.value.state.runUnlocks.scanners?.unlocked).toBe(true)
+    expect(Number(unlocked.value.state.resources.money)).toBeLessThan(5000)
+
+    const purchased = await purchaseUpgrade({
+      state: unlocked.value.state,
+      upgradeId: 'scanners',
+    })
+
+    expect(purchased.ok).toBe(true)
   })
 
   it('purchaseUpgrade uses bought employees for capacity, not boosted staff mastery output', async () => {
@@ -200,12 +255,21 @@ describe('chapter 6 - progression use-cases', () => {
     const repository = new LocalBalanceCatalogRepository()
     const clock = new StubClock(Date.parse('2026-04-21T12:00:00.000Z'))
     const triggerWarehouseReset = createTriggerWarehouseResetUseCase(repository, clock)
+    const resolver = new BalanceResolver(balanceCatalogV1)
+    const requiredPackages = resolver.resolveWarehouseRequirement(
+      'warehouse.progression',
+      1,
+    )
+    const nextWarehousePackagesRequired = resolver.resolveWarehouseRequirement(
+      'warehouse.progression',
+      2,
+    )
 
     const result = await triggerWarehouseReset({
       state: createBaseState({
         resources: {
           money: '50000',
-          packages: '1200',
+          packages: String(requiredPackages),
         },
         upgrades: {
           employees: { level: 4 },
@@ -213,6 +277,12 @@ describe('chapter 6 - progression use-cases', () => {
           conveyors: { level: 1 },
           carts: { level: 1 },
           trucks: { level: 1 },
+        },
+        runUnlocks: {
+          scanners: { unlocked: true },
+          conveyors: { unlocked: true },
+          carts: { unlocked: true },
+          trucks: { unlocked: true },
         },
       }),
     })
@@ -227,12 +297,18 @@ describe('chapter 6 - progression use-cases', () => {
     )
     expect(result.value.state.resources.packages).toBe('0')
     expect(result.value.state.upgrades).toEqual({})
+    expect(result.value.state.runUnlocks).toEqual({})
     expect(result.value.state.progression.warehouseLevel).toBe(2)
     expect(result.value.state.progression.skillPoints).toBe(4)
     expect(result.value.state.progression.architecturePoints).toBe(1)
+    expect(result.value.completedWarehouseLevel).toBe(1)
+    expect(result.value.requiredPackages).toBe(requiredPackages)
+    expect(result.value.nextWarehouseCapacity).toBe(15)
+    expect(result.value.nextWarehousePackagesRequired).toBe(nextWarehousePackagesRequired)
+    expect(result.value.restartMoney).toBe(WAREHOUSE_RESET_STARTING_MONEY)
   })
 
-  it('triggerWarehouseReset rejects when funds are insufficient', async () => {
+  it('triggerWarehouseReset rejects when packages are insufficient', async () => {
     const repository = new LocalBalanceCatalogRepository()
     const clock = new StubClock(Date.parse('2026-04-21T12:00:00.000Z'))
     const triggerWarehouseReset = createTriggerWarehouseResetUseCase(repository, clock)
@@ -248,7 +324,7 @@ describe('chapter 6 - progression use-cases', () => {
 
     expect(result.ok).toBe(false)
     if (!result.ok) {
-      expect(result.error.code).toBe('INSUFFICIENT_FUNDS')
+      expect(result.error.code).toBe('INSUFFICIENT_PACKAGES')
     }
   })
 })

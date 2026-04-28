@@ -1,24 +1,18 @@
 <template>
   <main class="page-shell game-shell">
-    <section
-      v-if="!game.current"
-      class="panel-card"
-    >
+    <section v-if="!game.current" class="panel-card">
       <p class="message message-empty">
         {{ t("game.state.noSession") }}
       </p>
       <div class="empty-session-actions">
-        <button
-          class="button button-small button-ghost"
-          @click="goHome"
-        >
+        <button class="button button-small button-ghost" @click="goHome">
           {{ t("game.action.backHome") }}
         </button>
       </div>
     </section>
 
     <template v-else>
-      <aside class="dev-cheat-panel">
+      <aside v-if="isDevCheatPanelVisible" class="dev-cheat-panel">
         <p class="dev-cheat-title">
           {{ t("game.devtools.title") }}
         </p>
@@ -35,6 +29,12 @@
           >
             +1 CP
           </button>
+          <button
+            class="button button-ghost dev-cheat-button"
+            @click="resetDevSave"
+          >
+            {{ t("game.devtools.resetRun") }}
+          </button>
         </div>
       </aside>
 
@@ -44,15 +44,14 @@
             <div class="warehouse-stage warehouse-stage-list">
               <header class="terminal-header">
                 <div class="terminal-frame-line">
-                  <span>{{ t("game.terminal.brand") }}</span>
+                  <span>{{ currentRunTerminalLabel }}</span>
                   <span class="terminal-function-bar">dispatch-inc_v0.1</span>
                 </div>
                 <div class="terminal-frame-body terminal-frame-body-header">
                   <div class="terminal-title-block">
-                    <pre
-                      class="terminal-title-ascii"
-                      aria-hidden="true"
-                    >{{ warehouseAsciiArt }}</pre>
+                    <pre class="terminal-title-ascii" aria-hidden="true">{{
+                      warehouseAsciiArt
+                    }}</pre>
                     <div class="terminal-title-copy">
                       <h1 class="warehouse-stage-title">
                         {{ t("game.header.warehouseLevel") }}
@@ -60,11 +59,15 @@
                       </h1>
                       <p class="terminal-title-subline">
                         {{ t("game.header.nextWarehouseMoveCost") }}:
-                        {{ formatCurrency(nextWarehouseCost) }}
-                        <span
-                          class="terminal-cursor"
-                          aria-hidden="true"
-                        >_</span>
+                        {{ formatWholeCompact(nextWarehousePackagesRequired) }}
+                        {{ t("game.stats.packages") }}
+                        [
+                        {{ warehouseGoalProgressBar }}
+                        ]
+                        {{ warehouseGoalProgressPercent }}%
+                        <span class="terminal-cursor" aria-hidden="true"
+                          >_</span
+                        >
                       </p>
                     </div>
                   </div>
@@ -80,7 +83,8 @@
                       <span
                         class="warehouse-stage-action-caret"
                         aria-hidden="true"
-                      >&gt;</span>
+                        >&gt;</span
+                      >
                       <span class="warehouse-stage-action-label">
                         {{ t("game.action.openSkills") }}
                         ({{ game.current.progression.skillPoints }})
@@ -89,6 +93,9 @@
                     </button>
                     <button
                       class="button button-ghost warehouse-stage-action-link"
+                      :class="{
+                        'terminal-phosphor-text-glow': canTriggerWarehouseReset,
+                      }"
                       :aria-label="t('game.action.resetWarehouse')"
                       :title="t('game.action.resetWarehouse')"
                       :disabled="!canTriggerWarehouseReset"
@@ -98,8 +105,11 @@
                       <span
                         class="warehouse-stage-action-caret"
                         aria-hidden="true"
-                      >&gt;</span>
-                      <span class="warehouse-stage-action-label">{{ t("game.action.resetWarehouse") }}</span>
+                        >&gt;</span
+                      >
+                      <span class="warehouse-stage-action-label">{{
+                        t("game.action.resetWarehouse")
+                      }}</span>
                       <span class="warehouse-stage-action-bracket">]</span>
                     </button>
                     <button
@@ -112,180 +122,225 @@
                       <span
                         class="warehouse-stage-action-caret"
                         aria-hidden="true"
-                      >&gt;</span>
-                      <span class="warehouse-stage-action-label">{{ t("game.action.backHome") }}</span>
+                        >&gt;</span
+                      >
+                      <span class="warehouse-stage-action-label">{{
+                        t("game.action.backHome")
+                      }}</span>
                       <span class="warehouse-stage-action-bracket">]</span>
                     </button>
                   </div>
                 </div>
               </header>
 
-              <section class="game-resource-bar terminal-stats-frame">
-                <article class="game-resource-chip">
-                  <div class="game-resource-head">
-                    <pre
-                      class="game-resource-ascii"
-                      aria-hidden="true"
-                    >{{ statAsciiArt.money }}</pre>
-                    <p class="game-resource-title">
-                      {{ t("game.stats.money") }}
-                    </p>
-                  </div>
-                  <div class="game-resource-copy">
-                    <p class="game-resource-value">
-                      {{ formatWholeCurrency(displayedMoney) }}
-                    </p>
-                    <p class="game-resource-subvalue">
-                      {{ t("game.stats.moneyPerSec") }}:
-                      {{ formatCurrency(moneyPerSecond) }}
-                    </p>
-                  </div>
-                </article>
-                <article class="game-resource-chip">
-                  <div class="game-resource-head">
-                    <pre
-                      class="game-resource-ascii"
-                      aria-hidden="true"
-                    >{{ statAsciiArt.packages }}</pre>
-                    <p class="game-resource-title">
-                      {{ t("game.stats.packages") }}
-                    </p>
-                  </div>
-                  <div class="game-resource-copy">
-                    <p class="game-resource-value">
-                      {{ formatWholeCompact(displayedPackages) }}
-                    </p>
-                    <p class="game-resource-subvalue">
-                      {{ t("game.stats.packagesPerSec") }}:
-                      {{ formatCompact(packagesPerSecond) }}
-                    </p>
-                  </div>
-                </article>
-                <article class="game-resource-chip">
-                  <div class="game-resource-head">
-                    <pre
-                      class="game-resource-ascii"
-                      aria-hidden="true"
-                    >{{ statAsciiArt.team }}</pre>
-                    <p class="game-resource-title">
-                      {{ t("game.stats.team") }}
-                    </p>
-                  </div>
-                  <div class="game-resource-copy">
-                    <p class="game-resource-value">
-                      {{ employeesCount }}/{{ warehouseCapacity }}
-                    </p>
-                    <p class="game-resource-subvalue">
-                      {{ t("game.stats.capacityShort") }}:
-                      {{ warehouseCapacity }}
-                    </p>
-                  </div>
-                </article>
-                <article class="game-resource-chip">
-                  <div class="game-resource-head">
-                    <pre
-                      class="game-resource-ascii"
-                      aria-hidden="true"
-                    >{{ statAsciiArt.pace }}</pre>
-                    <p class="game-resource-title">
-                      {{ t("game.stats.pace") }}
-                    </p>
-                  </div>
-                  <div class="game-resource-copy">
-                    <p class="game-resource-value">
-                      {{ formatCadencePercent(tickDurationMs) }}
-                    </p>
-                    <p class="game-resource-subvalue">
-                      {{ t("game.stats.tickDuration") }}:
-                      {{ Math.round(tickDurationMs) }} ms
-                    </p>
-                  </div>
-                </article>
-              </section>
-
-              <section class="terminal-upgrade-list">
-                <article
-                  v-for="card in upgradeCards"
-                  :key="card.id"
-                  class="warehouse-hotspot-button warehouse-hotspot-button-list terminal-upgrade-row"
-                  :class="{
-                    'warehouse-hotspot-button-disabled': !card.canBuy,
-                    'terminal-upgrade-row-active': card.canBuy,
-                  }"
-                >
-                  <div class="terminal-upgrade-row-main">
-                    <div class="terminal-upgrade-identity">
-                      <pre
-                        class="terminal-upgrade-ascii"
-                        aria-hidden="true"
-                      >{{ upgradeAsciiArt(card.id) }}</pre>
-                      <div class="warehouse-hotspot-head-text">
-                        <span class="warehouse-hotspot-name">{{
-                          t(card.titleKey)
-                        }}</span>
-                        <span class="warehouse-hotspot-level">
-                          {{ t("game.upgrades.levelShort") }}
-                          {{ formatUpgradeLevel(card) }}
-                        </span>
-                      </div>
-                    </div>
-                    <div class="warehouse-hotspot-details warehouse-hotspot-details-static">
-                      <p class="warehouse-hotspot-description">
-                        {{ t(`game.upgrades.${card.id}.description`) }}
+              <template v-if="!isWarehouseGoalReached">
+                <section class="game-resource-bar terminal-stats-frame">
+                  <article class="game-resource-chip">
+                    <div class="game-resource-topline">
+                      <p class="game-resource-title">
+                        {{ t("game.stats.money") }}
                       </p>
-                      <p>
-                        {{ t("game.upgrades.baseEffect") }}:
-                        {{ formatUpgradeEffect(card.id, card.baseCurrentEffect) }}
-                        <span
-                          v-if="hasUpgradeSkillMultiplier(card)"
-                          class="skill-effect-badge"
-                        >
-                          {{ formatUpgradeSkillMultiplier(card) }}
+                      <p class="game-resource-value">
+                        {{ formatWholeCurrency(displayedMoney) }} €
+                      </p>
+                    </div>
+                    <div class="game-resource-copy">
+                      <p class="game-resource-subvalue">
+                        <span>{{ t("game.stats.moneyPerSec") }}</span>
+                        <strong>{{ formatCurrency(moneyPerSecond) }} €</strong>
+                      </p>
+                    </div>
+                  </article>
+                  <article class="game-resource-chip">
+                    <div class="game-resource-topline">
+                      <p class="game-resource-title">
+                        {{ t("game.stats.packages") }}
+                      </p>
+                      <p class="game-resource-value">
+                        {{ formatWholeCompact(displayedPackages) }}
+                      </p>
+                    </div>
+                    <div class="game-resource-copy">
+                      <p class="game-resource-subvalue">
+                        <span>{{ t("game.stats.packagesPerSec") }}</span>
+                        <strong>{{ formatCompact(packagesPerSecond) }}</strong>
+                      </p>
+                    </div>
+                  </article>
+                  <article class="game-resource-chip">
+                    <div class="game-resource-topline">
+                      <p class="game-resource-title">
+                        {{ t("game.stats.team") }}
+                      </p>
+                      <p class="game-resource-value">
+                        {{ employeesCount }}/{{ warehouseCapacity }}
+                      </p>
+                    </div>
+                    <div class="game-resource-copy">
+                      <p class="game-resource-subvalue">
+                        <span>
+                          {{ t("game.stats.capacityShort") }}
+                          <span
+                            v-if="hasWarehouseMasteryBonus"
+                            class="skill-effect-badge"
+                          >
+                            {{ formatSkillEffect(warehouseMasteryMultiplier) }}
+                          </span>
                         </span>
-                        <span aria-hidden="true"> | </span>
-                        <template v-if="card.isMaxLevel">
-                          {{ t("game.upgrades.maxLevelInline") }}
+                        <strong>{{ warehouseCapacity }}</strong>
+                      </p>
+                    </div>
+                  </article>
+                  <article class="game-resource-chip">
+                    <div class="game-resource-topline">
+                      <p class="game-resource-title">
+                        {{ t("game.stats.pace") }}
+                      </p>
+                      <p class="game-resource-value">
+                        {{ formatCadencePercent(tickDurationMs) }}
+                      </p>
+                    </div>
+                    <div class="game-resource-copy">
+                      <p class="game-resource-subvalue">
+                        <span>{{ t("game.stats.tickDuration") }}</span>
+                        <strong>{{ Math.round(tickDurationMs) }} ms</strong>
+                      </p>
+                    </div>
+                  </article>
+                </section>
+
+                <section class="terminal-upgrade-list">
+                  <article
+                    v-for="card in upgradeCards"
+                    :key="card.id"
+                    class="warehouse-hotspot-button warehouse-hotspot-button-list terminal-upgrade-row"
+                    :class="{
+                      'warehouse-hotspot-button-disabled': !card.canBuy,
+                      'terminal-upgrade-row-active': card.canBuy,
+                    }"
+                  >
+                    <div class="terminal-upgrade-row-main">
+                      <div class="terminal-upgrade-identity">
+                        <pre
+                          class="terminal-upgrade-ascii"
+                          aria-hidden="true"
+                          >{{ resolveUpgradeAsciiArt(card) }}</pre
+                        >
+                        <div class="warehouse-hotspot-head-text">
+                          <span class="warehouse-hotspot-name">{{
+                            resolveUpgradeDisplayName(card)
+                          }}</span>
+                          <span class="warehouse-hotspot-level">
+                            {{ resolveUpgradeLevelLabel(card) }}
+                          </span>
+                        </div>
+                      </div>
+                      <div
+                        class="warehouse-hotspot-details warehouse-hotspot-details-static"
+                      >
+                        <p class="warehouse-hotspot-description">
+                          {{ resolveUpgradeDescription(card) }}
+                          <span class="warehouse-hotspot-impact">
+                            {{ formatUpgradeRuntimeImpact(card) }}
+                          </span>
+                        </p>
+                        <template v-if="card.isUnlocked">
+                          <p>
+                            {{ t("game.upgrades.baseEffect") }}:
+                            {{
+                              formatUpgradeEffect(card.id, card.baseCurrentEffect)
+                            }}
+                            <span
+                              v-if="hasUpgradeSkillMultiplier(card)"
+                              class="skill-effect-badge"
+                            >
+                              {{ formatUpgradeSkillMultiplier(card) }}
+                            </span>
+                            <span aria-hidden="true"> | </span>
+                            <template v-if="card.isMaxLevel">
+                              {{ t("game.upgrades.maxLevelInline") }}
+                            </template>
+                            <template v-else>
+                              {{ t("game.upgrades.nextPurchaseEffect") }}:
+                              {{
+                                formatUpgradeEffect(card.id, card.currentEffect)
+                              }}
+                              →
+                              {{ formatUpgradeEffect(card.id, card.nextEffect) }}
+                            </template>
+                          </p>
                         </template>
                         <template v-else>
-                          {{ t("game.upgrades.nextPurchaseEffect") }}:
-                          {{ formatUpgradeEffect(card.id, card.currentEffect) }}
-                          →
-                          {{ formatUpgradeEffect(card.id, card.nextEffect) }}
+                          <p>
+                            {{ t("game.upgrades.unlockLine") }}:
+                            {{ formatCurrency(card.unlockCost ?? 0) }} €
+                          </p>
                         </template>
-                      </p>
+                      </div>
                     </div>
-                  </div>
-                  <button
-                    class="button button-small terminal-upgrade-status terminal-upgrade-action-link"
-                    :class="{
-                      'terminal-upgrade-status-ok': card.canBuy,
-                      'terminal-upgrade-status-ko': !card.canBuy,
-                    }"
-                    :disabled="!card.canBuy"
-                    :title="card.canBuy ? formatCurrency(card.currentCost) : t(card.reasonKey ?? 'game.upgrades.status.blocked')"
-                    @click="onWarehouseZoneAction(card.id)"
+                    <button
+                      class="button button-small terminal-upgrade-status terminal-upgrade-action-link"
+                      :class="{
+                        'terminal-upgrade-status-ok': card.canBuy || card.canUnlock,
+                        'terminal-upgrade-status-ko': !card.canBuy && !card.canUnlock,
+                      }"
+                      :disabled="!card.canBuy && !card.canUnlock"
+                      :title="
+                        card.canBuy || card.canUnlock
+                          ? `${formatCurrency(resolveUpgradeActionCost(card))} €`
+                          : t(card.reasonKey ?? 'game.upgrades.status.blocked')
+                      "
+                      @click="onWarehouseZoneAction(card.id)"
+                    >
+                      <span class="warehouse-stage-action-bracket">[</span>
+                      <span
+                        class="warehouse-stage-action-caret"
+                        aria-hidden="true"
+                        >&gt;</span
+                      >
+                      <span class="warehouse-stage-action-label">
+                        {{ resolveUpgradeActionLabel(card) }} :
+                        {{ formatCurrency(resolveUpgradeActionCost(card)) }} €
+                      </span>
+                      <span class="warehouse-stage-action-bracket">]</span>
+                    </button>
+                  </article>
+                </section>
+              </template>
+
+              <section v-else class="warehouse-goal-panel">
+                <p class="warehouse-goal-kicker">
+                  {{ t("game.goal.kicker") }}
+                </p>
+                <h2 class="warehouse-goal-title">
+                  {{ t("game.goal.title") }}
+                </h2>
+                <p class="warehouse-goal-copy">
+                  {{ t("game.goal.description") }}
+                </p>
+                <p class="warehouse-goal-copy warehouse-goal-copy-strong">
+                  {{ t("game.goal.skillReward") }}
+                </p>
+                <button
+                  class="button button-ghost warehouse-stage-action-link warehouse-goal-action terminal-phosphor-text-glow"
+                  @click="triggerWarehouseResetAction"
+                >
+                  <span class="warehouse-stage-action-bracket">[</span>
+                  <span class="warehouse-stage-action-caret" aria-hidden="true"
+                    >&gt;</span
                   >
-                    <span class="warehouse-stage-action-bracket">[</span>
-                    <span
-                      class="warehouse-stage-action-caret"
-                      aria-hidden="true"
-                    >&gt;</span>
-                    <span class="warehouse-stage-action-label">
-                      Acheter : {{ formatCurrency(card.currentCost) }}
-                    </span>
-                    <span class="warehouse-stage-action-bracket">]</span>
-                  </button>
-                </article>
+                  <span class="warehouse-stage-action-label">{{
+                    t("game.action.resetWarehouse")
+                  }}</span>
+                  <span class="warehouse-stage-action-bracket">]</span>
+                </button>
               </section>
 
               <footer class="terminal-footer">
                 <div class="terminal-frame-line">
                   <span>
                     &gt; {{ terminalStatusMessage }}
-                    <span
-                      class="terminal-cursor"
-                      aria-hidden="true"
-                    >_</span>
+                    <span class="terminal-cursor" aria-hidden="true">_</span>
                   </span>
                 </div>
               </footer>
@@ -295,10 +350,7 @@
       </section>
     </template>
 
-    <section
-      v-if="isSkillTreeOpen && game.current"
-      class="overlay"
-    >
+    <section v-if="isSkillTreeOpen && game.current" class="overlay">
       <article class="overlay-card overlay-card-large skill-tree-modal">
         <header class="panel-header panel-header-popup">
           <div class="popup-title-stack">
@@ -315,10 +367,7 @@
             :title="t('common.close')"
             @click="isSkillTreeOpen = false"
           >
-            <i
-              class="fa-solid fa-xmark"
-              aria-hidden="true"
-            />
+            <i class="fa-solid fa-xmark" aria-hidden="true" />
           </button>
         </header>
 
@@ -332,10 +381,7 @@
             >
               <div class="skill-branch-layout">
                 <header class="skill-branch-header">
-                  <i
-                    :class="branch.iconClass"
-                    aria-hidden="true"
-                  />
+                  <i :class="branch.iconClass" aria-hidden="true" />
                   <div class="skill-branch-content">
                     <h3>{{ t(branch.titleKey) }}</h3>
                     <template v-if="branch.skillId === 'offline.resilience'">
@@ -345,14 +391,18 @@
                       >
                         {{ t("game.skills.effect.offline.efficiency") }}
                         {{ formatPercent(branch.offlineCurrentEfficiency) }}
-                        →
-                        {{ formatPercent(branch.offlineNextEfficiency) }}
+                        <template v-if="branch.level < branch.maxLevel">
+                          →
+                          {{ formatPercent(branch.offlineNextEfficiency) }}
+                        </template>
                         ·
                         {{ formatHours(branch.offlineCurrentDurationHours) }}
                         h
-                        →
-                        {{ formatHours(branch.offlineNextDurationHours) }}
-                        h
+                        <template v-if="branch.level < branch.maxLevel">
+                          →
+                          {{ formatHours(branch.offlineNextDurationHours) }}
+                          h
+                        </template>
                       </p>
                     </template>
                     <p
@@ -361,13 +411,12 @@
                     >
                       {{ t(branch.effectLabelKey) }}:
                       {{ formatSkillEffect(branch.currentEffect) }}
-                      →
-                      {{ formatSkillEffect(branch.nextEffect) }}
+                      <template v-if="branch.level < branch.maxLevel">
+                        →
+                        {{ formatSkillEffect(branch.nextEffect) }}
+                      </template>
                     </p>
-                    <p
-                      v-else
-                      class="skill-branch-meta"
-                    >
+                    <p v-else class="skill-branch-meta">
                       {{ t("game.skills.effect.placeholder") }}
                     </p>
                   </div>
@@ -382,7 +431,9 @@
                       v-for="level in branch.maxLevel"
                       :key="`${branch.id}-node-${level}`"
                       class="skill-level-node"
-                      :class="{ 'skill-level-node-active': level <= branch.level }"
+                      :class="{
+                        'skill-level-node-active': level <= branch.level,
+                      }"
                     />
                   </div>
                   <button
@@ -391,7 +442,9 @@
                     :title="skillUnlockTitle()"
                     :disabled="!branch.canUnlock || !branch.skillId"
                     @click="
-                      branch.skillId ? unlockSkillAction(branch.skillId) : undefined
+                      branch.skillId
+                        ? unlockSkillAction(branch.skillId)
+                        : undefined
                     "
                   >
                     +
@@ -399,10 +452,7 @@
                 </div>
               </div>
 
-              <p
-                v-if="branch.statusKey"
-                class="skill-branch-state"
-              >
+              <p v-if="branch.statusKey" class="skill-branch-state">
                 {{ t(branch.statusKey) }}
               </p>
             </article>
@@ -411,10 +461,7 @@
       </article>
     </section>
 
-    <section
-      v-if="warehouseResetRecap && game.current"
-      class="overlay"
-    >
+    <section v-if="warehouseResetRecap && game.current" class="overlay">
       <article class="overlay-card">
         <header class="panel-header panel-header-popup">
           <h2 class="popup-title">
@@ -426,25 +473,23 @@
             :title="t('common.close')"
             @click="warehouseResetRecap = null"
           >
-            <i
-              class="fa-solid fa-xmark"
-              aria-hidden="true"
-            />
+            <i class="fa-solid fa-xmark" aria-hidden="true" />
           </button>
         </header>
-        <p class="reset-recap-value">
-          {{ t("game.reset.recap.warehouseLevel") }}:
-          {{ warehouseResetRecap.nextWarehouseLevel }}
+        <p class="reset-recap-copy">
+          {{ t("game.reset.recap.congrats") }}
         </p>
-        <p class="reset-recap-value">
-          {{ t("game.reset.recap.spent") }}:
-          {{ formatCurrency(warehouseResetRecap.spentMoney) }}
-        </p>
-        <p class="reset-recap-value">
-          {{ t("game.reset.recap.skillGain") }}: +{{
-            warehouseResetRecap.gainedSkillPoints
+        <p class="reset-recap-value reset-recap-value-inline">
+          {{ t("game.reset.recap.nextGoal") }}:
+          {{
+            formatWholeCompact(
+              warehouseResetRecap.nextWarehousePackagesRequired,
+            )
           }}
-          {{ t("game.skills.pointShort") }}
+          {{ t("game.stats.packages") }}
+        </p>
+        <p class="reset-recap-reward">
+          {{ t("game.reset.recap.skillGain") }}
         </p>
         <div class="confirm-actions">
           <button
@@ -457,20 +502,95 @@
       </article>
     </section>
 
-    <section
-      v-if="isIdleRestOpen"
-      class="overlay idle-rest-backdrop"
-    >
+    <section v-if="isIdleRestOpen" class="overlay idle-rest-backdrop">
       <article class="overlay-card idle-rest-modal">
         <p class="idle-rest-title">
           {{ t("game.idle.status") }}
         </p>
+        <p class="idle-rest-copy">
+          {{ t("game.idle.copy") }}
+        </p>
+        <div class="confirm-actions">
+          <button class="button button-primary" @click="resumeFromIdleRest">
+            {{ t("game.idle.resume") }}
+          </button>
+        </div>
+      </article>
+    </section>
+
+    <section v-if="isWelcomeBriefingOpen" class="overlay">
+      <article class="overlay-card welcome-briefing-modal">
+        <header class="panel-header panel-header-popup">
+          <h2 class="popup-title">
+            {{ t("game.welcome.title") }}
+          </h2>
+          <button
+            class="button button-ghost button-icon"
+            :aria-label="t('common.close')"
+            :title="t('common.close')"
+            @click="isWelcomeBriefingOpen = false"
+          >
+            <i class="fa-solid fa-xmark" aria-hidden="true" />
+          </button>
+        </header>
+
+        <p class="welcome-briefing-intro">
+          {{ t("game.welcome.intro") }}
+        </p>
+        <div class="welcome-briefing-steps">
+          <p class="welcome-briefing-step">
+            <span class="welcome-briefing-step-index">01</span>
+            {{ t("game.welcome.step.startProduction") }}
+          </p>
+          <p class="welcome-briefing-step">
+            <span class="welcome-briefing-step-index">02</span>
+            {{ t("game.welcome.step.reachQuota") }}
+          </p>
+          <p class="welcome-briefing-step">
+            <span class="welcome-briefing-step-index">03</span>
+            {{ t("game.welcome.step.moveWarehouse") }}
+          </p>
+        </div>
+        <p class="welcome-briefing-hint">
+          <span class="offline-report-hint-label">INFO //</span>
+          {{ t("game.welcome.hint") }}
+        </p>
         <div class="confirm-actions">
           <button
             class="button button-primary"
-            @click="resumeFromIdleRest"
+            @click="isWelcomeBriefingOpen = false"
           >
-            {{ t("game.idle.resume") }}
+            {{ t("game.welcome.continue") }}
+          </button>
+        </div>
+      </article>
+    </section>
+
+    <section v-if="isDevCheatRevealOpen" class="overlay">
+      <article class="overlay-card welcome-briefing-modal">
+        <header class="panel-header panel-header-popup">
+          <h2 class="popup-title">
+            {{ t("game.devtools.revealTitle") }}
+          </h2>
+          <button
+            class="button button-ghost button-icon"
+            :aria-label="t('common.close')"
+            :title="t('common.close')"
+            @click="isDevCheatRevealOpen = false"
+          >
+            <i class="fa-solid fa-xmark" aria-hidden="true" />
+          </button>
+        </header>
+
+        <p class="welcome-briefing-intro">
+          {{ t("game.devtools.revealBody") }}
+        </p>
+        <div class="confirm-actions">
+          <button
+            class="button button-primary"
+            @click="isDevCheatRevealOpen = false"
+          >
+            {{ t("game.welcome.continue") }}
           </button>
         </div>
       </article>
@@ -491,18 +611,21 @@
             :title="t('common.close')"
             @click="game.dismissOfflinePopup"
           >
-            <i
-              class="fa-solid fa-xmark"
-              aria-hidden="true"
-            />
+            <i class="fa-solid fa-xmark" aria-hidden="true" />
           </button>
         </header>
 
+        <p class="offline-report-intro">
+          {{ t("offline.report.intro") }}
+        </p>
+
         <p class="offline-key-value">
-          <span>{{ t("offline.report.durationLabel") }}</span>
-          <strong>{{
-            formatDuration(game.offlineReport.countedOfflineDurationMs)
-          }}</strong>
+          <span>{{ t("offline.report.durationSummaryLabel") }}</span>
+          <strong>
+            {{ formatDuration(game.offlineReport.countedOfflineDurationMs) }}
+            /
+            {{ formatHoursToDuration(offlineMaxDurationHours) }}
+          </strong>
         </p>
         <p class="offline-key-value">
           <span>{{ t("game.idle.report.efficiencyLabel") }}</span>
@@ -516,6 +639,10 @@
             )
           }}</strong>
         </p>
+        <p class="offline-key-value offline-key-value-loss">
+          <span>↓ {{ t("offline.report.packagesLostLabel") }}</span>
+          <strong>{{ formatCompact(offlinePackagesLost) }}</strong>
+        </p>
         <p class="offline-key-value">
           <span>{{ t("offline.report.moneyLabel") }}</span>
           <strong>{{
@@ -523,6 +650,14 @@
               toFiniteNumber(game.offlineReport.offlineMoneyGained),
             )
           }}</strong>
+        </p>
+        <p class="offline-key-value offline-key-value-loss">
+          <span>↓ {{ t("offline.report.moneyLostLabel") }}</span>
+          <strong>{{ formatCurrency(offlineMoneyLost) }}</strong>
+        </p>
+        <p v-if="!isOfflineSkillMaxed" class="offline-report-hint">
+          <span class="offline-report-hint-label">INFO //</span>
+          {{ t("offline.report.upgradeHint") }}
         </p>
         <div class="confirm-actions">
           <button
@@ -545,6 +680,7 @@ import { appContainer } from "@/app/di";
 import { mapGameErrorToUiTextKey } from "@/application/useCases/game/contracts";
 import { GameViewModelResolver } from "@/application/useCases/game/viewModel";
 import { mapSaveErrorToUiTextKey } from "@/application/useCases/save/contracts";
+import { createInitialGameState } from "@/application/useCases/save/helpers";
 import { ROUTE_HOME } from "@/presentation/router";
 import { useGameStore } from "@/presentation/stores/gameStore";
 import { useSaveMenuStore } from "@/presentation/stores/saveMenuStore";
@@ -554,7 +690,7 @@ const DEFAULT_TICK_INTERVAL_MS = 200;
 const MIN_TICK_INTERVAL_MS = 120;
 const MAX_TICK_INTERVAL_MS = 1000;
 const AUTOSAVE_INTERVAL_MS = 10000;
-const IDLE_REST_DELAY_MS = 5000;
+const IDLE_REST_DELAY_MS = 20000;
 const MAIN_BRANCH_MAX_LEVEL = 5;
 const LOOP_ERROR_TOAST_COOLDOWN_MS = 5000;
 
@@ -570,20 +706,29 @@ interface UpgradeCardVm extends UpgradeDefinition {
   currentLevel: number;
   nextLevel: number;
   currentCost: number;
+  unlockCost: number | null;
+  isUnlocked: boolean;
   skillMultiplier: number;
   baseCurrentEffect: number;
   baseNextEffect: number;
   currentEffect: number;
   nextEffect: number;
+  deltaPackagesPerSecond: number;
+  deltaMoneyPerSecond: number;
   canBuy: boolean;
+  canUnlock: boolean;
   isMaxLevel: boolean;
   maxLevel?: number;
   reasonKey?: string;
 }
 
 interface WarehouseResetRecap {
+  completedWarehouseLevel: number;
   nextWarehouseLevel: number;
-  spentMoney: number;
+  requiredPackages: number;
+  nextWarehouseCapacity: number;
+  nextWarehousePackagesRequired: number;
+  restartMoney: number;
   gainedSkillPoints: number;
 }
 
@@ -715,9 +860,11 @@ const ui = useUiStore();
 
 const getBalanceCatalog = appContainer.useCases.createGetBalanceCatalog();
 const runTickUseCase = appContainer.useCases.createRunTick();
-const applyOfflineProgressUseCase = appContainer.useCases.createApplyOfflineProgress();
+const applyOfflineProgressUseCase =
+  appContainer.useCases.createApplyOfflineProgress();
 const autosaveUseCase = appContainer.useCases.createAutosaveActiveSlot();
 const purchaseUpgradeUseCase = appContainer.useCases.createPurchaseUpgrade();
+const unlockUpgradeUseCase = appContainer.useCases.createUnlockUpgrade();
 const unlockSkillUseCase = appContainer.useCases.createUnlockSkill();
 const triggerWarehouseResetUseCase =
   appContainer.useCases.createTriggerWarehouseReset();
@@ -739,29 +886,30 @@ const balanceCatalog = ref<BalanceCatalogDto | null>(null);
 const isSkillTreeOpen = ref(false);
 const warehouseResetRecap = ref<WarehouseResetRecap | null>(null);
 const isIdleRestOpen = ref(false);
+const isWelcomeBriefingOpen = ref(false);
+const isDevCheatPanelVisible = ref(false);
+const isDevCheatRevealOpen = ref(false);
 const terminalStatusMessage = ref("");
 const displayedMoney = ref(0);
 const displayedPackages = ref(0);
 const warehouseAsciiArt = String.raw`
-   /\    
-  /__\   
- | [] |  
- |____|  
+   /\_/\   
+  /_[]_\  
+ /|_||_|\ 
+ ||_[]_|| 
+ ||____|| 
 `;
-const statAsciiArt = {
-  money: String.raw`(€)`,
-  packages: String.raw`[#]`,
-  team: String.raw`o o o`,
-  pace: String.raw`|:|`,
-} as const;
 
 let tickTimer: number | undefined;
 let autosaveTimer: number | undefined;
 let idleRestTimer: number | undefined;
 let tickInFlight = false;
 let autosaveInFlight = false;
+let offlineSyncInFlight = false;
 let lastTickErrorToastAt = 0;
 let lastAutosaveErrorToastAt = 0;
+let devCheatHoldTimer: number | undefined;
+const pressedDevCheatKeys = new Set<string>();
 
 const gameViewResolver = computed(() => {
   if (!balanceCatalog.value) {
@@ -793,13 +941,105 @@ const employeesCount = computed(() => gameSnapshot.value?.employees ?? 0);
 const warehouseCapacity = computed(
   () => gameSnapshot.value?.warehouseCapacity ?? 0,
 );
-const tickDurationMs = computed(() => gameSnapshot.value?.tickDurationMs ?? 0);
-const nextWarehouseCost = computed(
-  () => gameSnapshot.value?.nextWarehouseCost ?? 0,
+const warehouseMasteryMultiplier = computed(() => {
+  if (!game.current || !gameViewResolver.value) {
+    return 1;
+  }
+
+  return gameViewResolver.value.resolveSkillEffect(
+    "warehouse.mastery",
+    game.current.skills["warehouse.mastery"]?.level ?? 0,
+  );
+});
+const hasWarehouseMasteryBonus = computed(
+  () => Math.abs(warehouseMasteryMultiplier.value - 1) >= 1e-9,
 );
+const tickDurationMs = computed(() => gameSnapshot.value?.tickDurationMs ?? 0);
+const currentRunTerminalLabel = computed(() => {
+  const activeSlot = saveMenu.slots.find(
+    (slot) => slot.id === saveMenu.activeSlotId,
+  );
+  const fallbackSlot = activeSlot ?? saveMenu.slots[0];
+
+  if (!fallbackSlot) {
+    return t("game.terminal.brand");
+  }
+
+  return `DISPATCH INC. // ${fallbackSlot.label.toUpperCase()}`;
+});
+const nextWarehousePackagesRequired = computed(
+  () => gameSnapshot.value?.nextWarehousePackagesRequired ?? 0,
+);
+const warehouseGoalProgressRatio = computed(() => {
+  if (nextWarehousePackagesRequired.value <= 0) {
+    return 0;
+  }
+
+  return Math.max(
+    0,
+    Math.min(1, packages.value / nextWarehousePackagesRequired.value),
+  );
+});
+const warehouseGoalProgressPercent = computed(() =>
+  Math.floor(warehouseGoalProgressRatio.value * 100),
+);
+const warehouseGoalProgressBar = computed(() => {
+  const totalSlots = 10;
+  const filledSlots = Math.max(
+    0,
+    Math.min(
+      totalSlots,
+      Math.floor(warehouseGoalProgressRatio.value * totalSlots),
+    ),
+  );
+  const emptySlots = totalSlots - filledSlots;
+  return `${"█".repeat(filledSlots)}${"-".repeat(emptySlots)}`;
+});
 const offlineEfficiencyMultiplier = computed(() =>
   resolveCurrentIdleEfficiency(),
 );
+const offlineMaxDurationHours = computed(() => {
+  const offlineLevel = game.current?.skills["offline.resilience"]?.level ?? 0;
+  return resolveOfflineAtLevel(offlineLevel).durationHours;
+});
+const offlineMoneyLost = computed(() => {
+  const report = game.offlineReport;
+  const efficiency = offlineEfficiencyMultiplier.value;
+
+  if (
+    !report ||
+    !Number.isFinite(efficiency) ||
+    efficiency <= 0 ||
+    efficiency >= 1
+  ) {
+    return 0;
+  }
+
+  const gainedMoney = toFiniteNumber(report.offlineMoneyGained);
+  const fullEfficiencyMoney = gainedMoney / efficiency;
+  return Math.max(0, fullEfficiencyMoney - gainedMoney);
+});
+const offlinePackagesLost = computed(() => {
+  const report = game.offlineReport;
+  const efficiency = offlineEfficiencyMultiplier.value;
+
+  if (
+    !report ||
+    !Number.isFinite(efficiency) ||
+    efficiency <= 0 ||
+    efficiency >= 1
+  ) {
+    return 0;
+  }
+
+  const dispatchedPackages = toFiniteNumber(report.offlinePackagesDispatched);
+  const fullEfficiencyPackages = dispatchedPackages / efficiency;
+  return Math.max(0, fullEfficiencyPackages - dispatchedPackages);
+});
+const isOfflineSkillMaxed = computed(() => {
+  const offlineLevel = game.current?.skills["offline.resilience"]?.level ?? 0;
+  return offlineLevel >= 5;
+});
 
 const tickLoopDelayMs = computed(() => {
   if (!Number.isFinite(tickDurationMs.value) || tickDurationMs.value <= 0) {
@@ -815,10 +1055,11 @@ const tickLoopDelayMs = computed(() => {
 const canTriggerWarehouseReset = computed(() => {
   return (
     game.current !== null &&
-    money.value >= nextWarehouseCost.value &&
-    nextWarehouseCost.value > 0
+    packages.value >= nextWarehousePackagesRequired.value &&
+    nextWarehousePackagesRequired.value > 0
   );
 });
+const isWarehouseGoalReached = computed(() => canTriggerWarehouseReset.value);
 
 const mainBranchLevels = computed(() =>
   SKILL_BRANCHES.filter((branch) => !branch.hidden).map((branch) =>
@@ -843,28 +1084,55 @@ const upgradeCards = computed<UpgradeCardVm[]>(() => {
         currentLevel: 0,
         nextLevel: 1,
         currentCost: 0,
+        unlockCost: null,
+        isUnlocked: definition.id === "employees",
         skillMultiplier: 1,
         baseCurrentEffect: 0,
         baseNextEffect: 0,
         currentEffect: 0,
         nextEffect: 0,
+        deltaPackagesPerSecond: 0,
+        deltaMoneyPerSecond: 0,
         canBuy: false,
+        canUnlock: false,
         isMaxLevel: false,
       };
     }
 
     const maxLevel = snapshot.maxLevel;
     const currentLevel = snapshot.currentLevel;
+    const isUnlocked = snapshot.isUnlocked;
     const isMaxLevel = maxLevel !== undefined && currentLevel >= maxLevel;
     const isEmployeesAtCapacity =
       definition.id === "employees" &&
       employeesCount.value >= warehouseCapacity.value;
 
     const hasEnoughMoney = money.value >= snapshot.currentCost;
-    const canBuy = !isMaxLevel && hasEnoughMoney && !isEmployeesAtCapacity;
+    const hasEnoughMoneyToUnlock =
+      snapshot.unlockCost !== null && money.value >= snapshot.unlockCost;
+    const canUnlock = !isUnlocked && hasEnoughMoneyToUnlock;
+    const canBuy =
+      isUnlocked && !isMaxLevel && hasEnoughMoney && !isEmployeesAtCapacity;
+    const previewSnapshot = gameViewResolver.value?.createSnapshot({
+      ...game.current,
+      upgrades: {
+        ...game.current.upgrades,
+        [definition.id]: { level: snapshot.nextLevel },
+      },
+    });
+    const deltaPackagesPerSecond = previewSnapshot
+      ? previewSnapshot.packagesPerSecond - gameSnapshot.value.packagesPerSecond
+      : 0;
+    const deltaMoneyPerSecond = previewSnapshot
+      ? previewSnapshot.moneyPerSecond - gameSnapshot.value.moneyPerSecond
+      : 0;
 
     let reasonKey: string | undefined;
-    if (isMaxLevel) {
+    if (!isUnlocked) {
+      reasonKey = hasEnoughMoneyToUnlock
+        ? undefined
+        : "errors.insufficientFunds";
+    } else if (isMaxLevel) {
       reasonKey = "errors.maxLevelReached";
     } else if (isEmployeesAtCapacity) {
       reasonKey = "errors.capacityReached";
@@ -877,12 +1145,17 @@ const upgradeCards = computed<UpgradeCardVm[]>(() => {
       currentLevel,
       nextLevel: snapshot.nextLevel,
       currentCost: snapshot.currentCost,
+      unlockCost: snapshot.unlockCost,
+      isUnlocked,
       skillMultiplier: snapshot.skillMultiplier,
       baseCurrentEffect: snapshot.baseCurrentEffect,
       baseNextEffect: snapshot.baseNextEffect,
       currentEffect: snapshot.currentEffect,
       nextEffect: snapshot.nextEffect,
+      deltaPackagesPerSecond,
+      deltaMoneyPerSecond,
       canBuy,
+      canUnlock,
       isMaxLevel,
       maxLevel,
       reasonKey,
@@ -935,12 +1208,19 @@ const skillBranchCards = computed<SkillBranchVm[]>(() => {
     const offlineNext = resolveOfflineAtLevel(previewLevel);
     const effectLabelKey = resolveSkillEffectLabelKey(descriptor.skillId);
     const currentEffect =
-      descriptor.skillId && descriptor.skillId !== "offline.resilience" && gameViewResolver.value
+      descriptor.skillId &&
+      descriptor.skillId !== "offline.resilience" &&
+      gameViewResolver.value
         ? gameViewResolver.value.resolveSkillEffect(descriptor.skillId, level)
         : 0;
     const nextEffect =
-      descriptor.skillId && descriptor.skillId !== "offline.resilience" && gameViewResolver.value
-        ? gameViewResolver.value.resolveSkillEffect(descriptor.skillId, previewLevel)
+      descriptor.skillId &&
+      descriptor.skillId !== "offline.resilience" &&
+      gameViewResolver.value
+        ? gameViewResolver.value.resolveSkillEffect(
+            descriptor.skillId,
+            previewLevel,
+          )
         : 0;
 
     return {
@@ -1019,6 +1299,11 @@ function formatDuration(durationMs: number): string {
   return `${hh}:${mm}:${ss}`;
 }
 
+function formatHoursToDuration(durationHours: number): string {
+  const safeHours = Number.isFinite(durationHours) ? durationHours : 0;
+  return formatDuration(safeHours * 60 * 60 * 1000);
+}
+
 function formatCadencePercent(durationMs: number): string {
   if (!Number.isFinite(durationMs) || durationMs <= 0) {
     return "0%";
@@ -1032,13 +1317,13 @@ function formatUpgradeEffect(upgradeId: UpgradeId, effect: number): string {
     case "employees":
       return `${Math.max(0, Math.round(effect - 1))}`;
     case "scanners":
-      return formatPercent(effect);
+      return `+${formatPercent(effect)}`;
     case "conveyors":
     case "carts":
     case "trucks":
       return `x${Math.round(effect * 100) / 100}`;
     default:
-      return `${effect}`;
+      return `+${effect}`;
   }
 }
 
@@ -1057,29 +1342,89 @@ function formatUpgradeLevel(card: UpgradeCardVm): string {
     : `${card.currentLevel}`;
 }
 
+function resolveUpgradeDisplayName(card: UpgradeCardVm): string {
+  return card.isUnlocked ? t(card.titleKey) : t("game.upgrades.locked.title");
+}
+
+function resolveUpgradeLevelLabel(card: UpgradeCardVm): string {
+  return card.isUnlocked
+    ? `${t("game.upgrades.levelShort")} ${formatUpgradeLevel(card)}`
+    : t("game.upgrades.locked.level");
+}
+
+function resolveUpgradeDescription(card: UpgradeCardVm): string {
+  return card.isUnlocked
+    ? t(`game.upgrades.${card.id}.description`)
+    : t("game.upgrades.locked.description");
+}
+
+function formatUpgradeRuntimeImpact(card: UpgradeCardVm): string {
+  if (!card.isUnlocked) {
+    return "";
+  }
+
+  const parts: string[] = [];
+
+  if (card.deltaPackagesPerSecond > 0.0001) {
+    parts.push(`+${formatCompact(card.deltaPackagesPerSecond)} colis/sec`);
+  }
+
+  if (card.deltaMoneyPerSecond > 0.0001) {
+    parts.push(`+${formatCurrency(card.deltaMoneyPerSecond)} €/sec`);
+  }
+
+  if (parts.length === 0) {
+    return "";
+  }
+
+  return `(${parts.join(" • ")})`;
+}
+
+function resolveUpgradeActionLabel(card: UpgradeCardVm): string {
+  return card.isUnlocked
+    ? t("game.upgrades.action.buy")
+    : t("game.upgrades.action.unlock");
+}
+
+function resolveUpgradeActionCost(card: UpgradeCardVm): number {
+  return card.isUnlocked ? card.currentCost : (card.unlockCost ?? 0);
+}
+
 function upgradeAsciiArt(upgradeId: UpgradeId): string {
   switch (upgradeId) {
     case "employees":
-      return String.raw`/o o\
-{o|o}
-o|o|o`;
+      return String.raw` o o 
+/|_|\
+/\ /\\`;
     case "scanners":
-      return String.raw`|||||||
-|||||||
-|||||||`;
+      return String.raw`|[=]| 
+|[=]| 
+|[=]|`;
     case "conveyors":
-      return String.raw`[=o=o=]
-[=o=o=]`;
+      return String.raw`==o==o
+==o==o
+==o==o`;
     case "carts":
-      return String.raw`__[]
-o--o`;
+      return String.raw` __[] 
+|_[]| 
+ o--o `;
     case "trucks":
-      return String.raw`____
-|__\_
-o--o`;
+      return String.raw` ____ 
+|_||\_
+o-oo-o`;
     default:
       return "[]";
   }
+}
+
+function resolveUpgradeAsciiArt(card: UpgradeCardVm): string {
+  if (card.isUnlocked) {
+    return upgradeAsciiArt(card.id);
+  }
+
+  return String.raw`▒▒▒▒▒
+▒ ? ▒
+▒▒▒▒▒`;
 }
 
 function offlineTooltip(branch: SkillBranchVm): string {
@@ -1182,10 +1527,31 @@ function applyDevSkillPointCheat(): void {
   notifySuccess("game.devtools.skillPointAdded");
 }
 
-function notifyLoopError(
-  messageKey: string,
-  lastToastAt: number,
-): number {
+async function resetDevSave(): Promise<void> {
+  if (!game.current) {
+    return;
+  }
+
+  const nowIso = new Date().toISOString();
+  const resetState = createInitialGameState(nowIso);
+
+  clearIdleRestTimer();
+  stopLoops();
+  isSkillTreeOpen.value = false;
+  warehouseResetRecap.value = null;
+  isIdleRestOpen.value = false;
+  isWelcomeBriefingOpen.value = false;
+  resetDevCheatVisibility();
+  game.setCurrentState(resetState);
+  game.setOfflineReport(null, false);
+  syncDisplayedResources();
+  maybeOpenWelcomeBriefing();
+  startLoops();
+  notifySuccess("game.devtools.resetRunSuccess");
+  await autosaveNow();
+}
+
+function notifyLoopError(messageKey: string, lastToastAt: number): number {
   const now = Date.now();
   if (now - lastToastAt < LOOP_ERROR_TOAST_COOLDOWN_MS) {
     return lastToastAt;
@@ -1238,7 +1604,12 @@ function syncDisplayedResources(): void {
 }
 
 function scheduleNextTickLoop(delayMs = tickLoopDelayMs.value): void {
-  if (tickTimer || !game.current || isIdleRestOpen.value) {
+  if (
+    tickTimer ||
+    !game.current ||
+    isIdleRestOpen.value ||
+    isWarehouseGoalReached.value
+  ) {
     return;
   }
 
@@ -1259,7 +1630,7 @@ function restartTickLoop(): void {
 }
 
 function startLoops(): void {
-  if (isIdleRestOpen.value) {
+  if (isIdleRestOpen.value || isWarehouseGoalReached.value) {
     return;
   }
 
@@ -1293,6 +1664,74 @@ function clearIdleRestTimer(): void {
   idleRestTimer = undefined;
 }
 
+function clearDevCheatHoldTimer(): void {
+  if (!devCheatHoldTimer) {
+    return;
+  }
+
+  globalThis.clearTimeout(devCheatHoldTimer);
+  devCheatHoldTimer = undefined;
+}
+
+function resetDevCheatVisibility(): void {
+  isDevCheatPanelVisible.value = false;
+  isDevCheatRevealOpen.value = false;
+  pressedDevCheatKeys.clear();
+  clearDevCheatHoldTimer();
+}
+
+function canArmDevCheatHold(): boolean {
+  return (
+    !isDevCheatPanelVisible.value &&
+    pressedDevCheatKeys.has("f") &&
+    pressedDevCheatKeys.has("u")
+  );
+}
+
+function revealDevCheatPanel(): void {
+  if (isDevCheatPanelVisible.value) {
+    return;
+  }
+
+  isDevCheatPanelVisible.value = true;
+  isDevCheatRevealOpen.value = true;
+  terminalStatusMessage.value = t("game.devtools.revealTitle");
+  clearDevCheatHoldTimer();
+}
+
+function armDevCheatHold(): void {
+  if (!canArmDevCheatHold() || devCheatHoldTimer) {
+    return;
+  }
+
+  devCheatHoldTimer = globalThis.setTimeout(() => {
+    devCheatHoldTimer = undefined;
+    revealDevCheatPanel();
+  }, 5000);
+}
+
+function handleDevCheatKeyDown(event: { key: string }): void {
+  const key = event.key.toLowerCase();
+  if (key !== "f" && key !== "u") {
+    return;
+  }
+
+  pressedDevCheatKeys.add(key);
+  armDevCheatHold();
+}
+
+function handleDevCheatKeyUp(event: { key: string }): void {
+  const key = event.key.toLowerCase();
+  if (key !== "f" && key !== "u") {
+    return;
+  }
+
+  pressedDevCheatKeys.delete(key);
+  if (!canArmDevCheatHold()) {
+    clearDevCheatHoldTimer();
+  }
+}
+
 async function enterIdleRest(): Promise<void> {
   clearIdleRestTimer();
 
@@ -1313,10 +1752,30 @@ function resolveCurrentIdleEfficiency(): number {
   return resolveOfflineAtLevel(offlineLevel).efficiency;
 }
 
+function shouldShowWelcomeBriefingOnEntry(): boolean {
+  return (
+    game.current !== null &&
+    game.current.progression.warehouseLevel === 1 &&
+    packagesPerSecond.value <= 0 &&
+    moneyPerSecond.value <= 0 &&
+    !isIdleRestOpen.value &&
+    !game.shouldShowOfflinePopup
+  );
+}
+
+function maybeOpenWelcomeBriefing(): void {
+  if (shouldShowWelcomeBriefingOnEntry()) {
+    isWelcomeBriefingOpen.value = true;
+  }
+}
+
 function shouldArmIdleRest(): boolean {
   return (
     game.current !== null &&
     !isIdleRestOpen.value &&
+    !isWarehouseGoalReached.value &&
+    packagesPerSecond.value > 0 &&
+    moneyPerSecond.value > 0 &&
     typeof globalThis.document !== "undefined" &&
     (globalThis.document.hidden || !globalThis.document.hasFocus())
   );
@@ -1391,7 +1850,38 @@ async function purchaseUpgradeAction(upgradeId: UpgradeId): Promise<void> {
   await autosaveNow();
 }
 
+async function unlockUpgradeAction(upgradeId: UpgradeId): Promise<void> {
+  if (!game.current) {
+    return;
+  }
+
+  const result = await unlockUpgradeUseCase({
+    state: game.current,
+    upgradeId,
+  });
+
+  if (!result.ok) {
+    notifyError(mapGameErrorToUiTextKey(result.error.code));
+    return;
+  }
+
+  game.setCurrentState(result.value.state);
+  restartTickLoop();
+  notifySuccess("game.feedback.upgradeUnlocked");
+  await autosaveNow();
+}
+
 async function onWarehouseZoneAction(upgradeId: UpgradeId): Promise<void> {
+  const card = upgradeCards.value.find((entry) => entry.id === upgradeId);
+  if (!card) {
+    return;
+  }
+
+  if (!card.isUnlocked) {
+    await unlockUpgradeAction(upgradeId);
+    return;
+  }
+
   await purchaseUpgradeAction(upgradeId);
 }
 
@@ -1427,10 +1917,15 @@ async function triggerWarehouseResetAction(): Promise<void> {
   }
 
   game.setCurrentState(result.value.state);
+  resetDevCheatVisibility();
   restartTickLoop();
   warehouseResetRecap.value = {
+    completedWarehouseLevel: result.value.completedWarehouseLevel,
     nextWarehouseLevel: result.value.nextWarehouseLevel,
-    spentMoney: result.value.spentMoney,
+    requiredPackages: result.value.requiredPackages,
+    nextWarehouseCapacity: result.value.nextWarehouseCapacity,
+    nextWarehousePackagesRequired: result.value.nextWarehousePackagesRequired,
+    restartMoney: result.value.restartMoney,
     gainedSkillPoints:
       result.value.state.progression.skillPoints - previousSkillPoints,
   };
@@ -1457,13 +1952,21 @@ async function autoResumeLatestSaveOnGameEntry(): Promise<void> {
 }
 
 async function syncOfflineOnGameEntry(): Promise<void> {
-  if (!game.current || !game.pendingOfflineSync || game.shouldShowOfflinePopup) {
+  if (
+    !game.current ||
+    !balanceCatalog.value ||
+    !game.pendingOfflineSync ||
+    game.shouldShowOfflinePopup ||
+    offlineSyncInFlight
+  ) {
     return;
   }
 
+  offlineSyncInFlight = true;
   const result = await applyOfflineProgressUseCase({
     state: game.current,
   });
+  offlineSyncInFlight = false;
 
   if (!result.ok) {
     notifyError(mapGameErrorToUiTextKey(result.error.code));
@@ -1477,8 +1980,35 @@ async function syncOfflineOnGameEntry(): Promise<void> {
   } else {
     game.setOfflineReport(null, false);
   }
+  maybeOpenWelcomeBriefing();
   await autosaveNow();
 }
+
+watch(
+  () => ({
+    hasCatalog: balanceCatalog.value !== null,
+    hasCurrent: game.current !== null,
+    pendingOfflineSync: game.pendingOfflineSync,
+    shouldShowOfflinePopup: game.shouldShowOfflinePopup,
+  }),
+  async ({
+    hasCatalog,
+    hasCurrent,
+    pendingOfflineSync,
+    shouldShowOfflinePopup,
+  }) => {
+    if (
+      !hasCatalog ||
+      !hasCurrent ||
+      !pendingOfflineSync ||
+      shouldShowOfflinePopup
+    ) {
+      return;
+    }
+
+    await syncOfflineOnGameEntry();
+  },
+);
 
 watch(
   money,
@@ -1496,11 +2026,27 @@ watch(
   { immediate: true },
 );
 
+watch(
+  isWarehouseGoalReached,
+  async (reachedGoal) => {
+    if (!reachedGoal) {
+      return;
+    }
+
+    clearIdleRestTimer();
+    stopLoops();
+    terminalStatusMessage.value = t("game.goal.status");
+    await autosaveNow();
+  },
+  { immediate: true },
+);
+
 onMounted(async () => {
   if (!ui.hasLoaded) {
     await ui.initialize("fr-FR");
   }
 
+  resetDevCheatVisibility();
   terminalStatusMessage.value = t("game.terminal.ready");
 
   await autoResumeLatestSaveOnGameEntry();
@@ -1513,11 +2059,14 @@ onMounted(async () => {
   }
 
   await syncOfflineOnGameEntry();
+  maybeOpenWelcomeBriefing();
 
   startLoops();
 
   globalThis.addEventListener("blur", handleVisibilityOrFocusChange);
   globalThis.addEventListener("focus", handleVisibilityOrFocusChange);
+  globalThis.addEventListener("keydown", handleDevCheatKeyDown);
+  globalThis.addEventListener("keyup", handleDevCheatKeyUp);
   globalThis.document.addEventListener(
     "visibilitychange",
     handleVisibilityOrFocusChange,
@@ -1525,10 +2074,13 @@ onMounted(async () => {
 });
 
 onUnmounted(() => {
+  resetDevCheatVisibility();
   clearIdleRestTimer();
   stopLoops();
   globalThis.removeEventListener("blur", handleVisibilityOrFocusChange);
   globalThis.removeEventListener("focus", handleVisibilityOrFocusChange);
+  globalThis.removeEventListener("keydown", handleDevCheatKeyDown);
+  globalThis.removeEventListener("keyup", handleDevCheatKeyUp);
   globalThis.document.removeEventListener(
     "visibilitychange",
     handleVisibilityOrFocusChange,

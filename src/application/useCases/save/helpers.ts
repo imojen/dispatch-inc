@@ -33,6 +33,7 @@ export function createInitialGameState(nowIso: string): GameStateDto {
       skillPoints: 0,
     },
     upgrades: {},
+    runUnlocks: {},
     skills: {},
   }
 }

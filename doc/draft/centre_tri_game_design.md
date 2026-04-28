@@ -4,7 +4,8 @@
 
 Jeu incrémental idle où le joueur gère un centre de tri de colis.\
 Objectif : traiter toujours plus de colis pour gagner de l'argent et
-déménager vers des entrepôts plus grands.
+atteindre le prochain objectif colis afin de déménager vers des
+entrepôts plus grands.
 
 ------------------------------------------------------------------------
 
@@ -14,7 +15,8 @@ déménager vers des entrepôts plus grands.
 2.  Gagner de l'argent (€)
 3.  Acheter des améliorations
 4.  Atteindre un plafond de progression
-5.  Acheter un nouvel entrepôt (reset)
+5.  Atteindre l'objectif colis du prochain entrepôt puis déménager
+    (reset)
 6.  Gagner 1 point de compétence
 7.  Recommencer avec de meilleures capacités
 
@@ -77,6 +79,9 @@ offline doit s'afficher avec :
 
 Règle UX v1:
 - chaque upgrade du warehouse doit exposer une phrase de description textuelle (dans le détail du hotspot) expliquant clairement son impact gameplay.
+- à chaque nouvelle run, seules les améliorations `Employes` sont ouvertes par défaut.
+- `Scanners`, `Tapis`, `Chariots` et `Camions` doivent être redébloqués via un coût unique en euros pour la run en cours.
+- après déménagement, ces déblocages sont réinitialisés.
 
 ### 👷 Employés
 
@@ -131,19 +136,23 @@ Tick = modifié par tapis roulants
 
 ## 🏢 Entrepôts (exemple)
 
-  Niveau   Coût       Capacité employés
-  -------- ---------- -------------------
-  1        \-         5
-  2        1 000€     10
-  3        10 000€    20
-  4        100 000€   40
+  Niveau   Objectif colis   Capacité employés
+  -------- ---------------- -------------------
+  1        \-               5
+  2        200              10
+  3        800              20
+  4        1 800            40
 
 ------------------------------------------------------------------------
 
 ## 🔄 Reset --- Déménagement
 
-Quand un nouvel entrepôt est acheté :
+Quand l'objectif colis du prochain entrepôt est atteint et que le
+déménagement est déclenché :
 
+-   la production s'arrete immediatement
+-   l'entrepot n'accorde plus aucun gain supplementaire
+-   le joueur doit demenager pour relancer une nouvelle run
 -   Reset complet :
     -   argent = 0
     -   améliorations = 0

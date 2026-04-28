@@ -1,6 +1,7 @@
 import type { BalanceCatalogDto } from '@/application/dto/balance'
 import type { GameStateDto } from '@/application/dto/game'
 import {
+  isUpgradeUnlocked,
   resolveEffectiveUpgradeEffect,
   resolveGameState,
   resolveUpgradeSkillMultiplier,
@@ -13,6 +14,8 @@ export interface UpgradeSnapshotDto {
   currentLevel: number
   nextLevel: number
   currentCost: number
+  unlockCost: number | null
+  isUnlocked: boolean
   skillMultiplier: number
   baseCurrentEffect: number
   baseNextEffect: number
@@ -34,7 +37,7 @@ export interface GameRuntimeSnapshotDto {
   employees: number
   warehouseCapacity: number
   tickDurationMs: number
-  nextWarehouseCost: number
+  nextWarehousePackagesRequired: number
   upgrades: Record<string, UpgradeSnapshotDto>
 }
 
@@ -81,6 +84,8 @@ export class GameViewModelResolver {
         currentLevel,
         nextLevel: preview.nextLevel,
         currentCost: preview.currentCost,
+        unlockCost: preview.unlockCost ?? null,
+        isUnlocked: isUpgradeUnlocked(state.runUnlocks, upgrade.upgradeId),
         skillMultiplier: resolveUpgradeSkillMultiplier(
           upgrade.upgradeId,
           state,
@@ -122,7 +127,7 @@ export class GameViewModelResolver {
       employees: resolved.runState.ownedEmployees,
       warehouseCapacity: resolved.warehouseCapacity,
       tickDurationMs,
-      nextWarehouseCost: this.resolver.resolveWarehouseCost(
+      nextWarehousePackagesRequired: this.resolver.resolveWarehouseRequirement(
         'warehouse.progression',
         state.progression.warehouseLevel,
       ),

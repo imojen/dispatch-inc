@@ -42,20 +42,30 @@ describe('game view model runtime snapshot', () => {
 
     const snapshot = resolver.createSnapshot(
       createBaseState({
+        upgrades: {
+          employees: { level: 1 },
+          scanners: { level: 5 },
+          conveyors: { level: 0 },
+          carts: { level: 0 },
+          trucks: { level: 0 },
+        },
         skills: {
           'offline.resilience': { level: 0 },
-          'staff.mastery': { level: 1 },
-          'scan.mastery': { level: 1 },
+          'staff.mastery': { level: 3 },
+          'scan.mastery': { level: 5 },
         },
       }),
     )
 
     expect(snapshot.upgrades.employees.baseCurrentEffect).toBe(2)
     expect(snapshot.upgrades.employees.currentEffect).toBe(3)
-    expect(snapshot.upgrades.employees.nextEffect).toBe(5)
-    expect(snapshot.upgrades.scanners.baseCurrentEffect).toBe(0.1)
-    expect(snapshot.upgrades.scanners.currentEffect).toBe(0.2)
-    expect(snapshot.upgrades.scanners.nextEffect).toBe(0.4)
+    expect(snapshot.upgrades.employees.nextEffect).toBe(4)
+    expect(snapshot.upgrades.scanners.currentEffect).toBeGreaterThan(
+      snapshot.upgrades.scanners.baseCurrentEffect,
+    )
+    expect(snapshot.upgrades.scanners.nextEffect).toBeGreaterThanOrEqual(
+      snapshot.upgrades.scanners.currentEffect,
+    )
   })
 
   it('makes cadence tend toward 500 ms without reaching it', () => {

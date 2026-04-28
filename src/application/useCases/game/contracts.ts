@@ -4,6 +4,8 @@ export type GameErrorCode =
   | 'UNKNOWN_SKILL'
   | 'MAX_LEVEL_REACHED'
   | 'INSUFFICIENT_FUNDS'
+  | 'INSUFFICIENT_PACKAGES'
+  | 'UPGRADE_LOCKED'
   | 'CAPACITY_REACHED'
   | 'SAVE_SCHEMA_INVALID'
   | 'SAVE_WRITE_FAILED'
@@ -56,6 +58,8 @@ export function mapGameErrorToUiTextKey(code: GameErrorCode): string {
     UNKNOWN_SKILL: 'errors.unknownSkill',
     MAX_LEVEL_REACHED: 'errors.maxLevelReached',
     INSUFFICIENT_FUNDS: 'errors.insufficientFunds',
+    INSUFFICIENT_PACKAGES: 'errors.insufficientPackages',
+    UPGRADE_LOCKED: 'errors.upgradeLocked',
     CAPACITY_REACHED: 'errors.capacityReached',
     SAVE_SCHEMA_INVALID: 'errors.saveSchemaInvalid',
     SAVE_WRITE_FAILED: 'errors.saveWriteFailed',

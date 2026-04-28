@@ -39,6 +39,7 @@ The UI must: - Be readable in \< 2 seconds - Show progression visually
 -   Top header: large terminal frame with system label + action keys + `Entrepot niveau X`
 -   Under header: compact terminal stats modules (`Euros / sec`, `Colis / sec`, `Equipe`, `Cadence`) with secondary values on each module
 -   Upgrade controls are displayed below as a direct vertical list of terminal rows
+-   Once the warehouse package objective is reached, the stat bar and upgrade list disappear and are replaced by a clear migration call-to-action state
 -   No dedicated left stats column in game view
 -   Footer: persistent terminal log / command hint bar
 -   Main panel is docked to the top of the viewport with a clean neutral surface
@@ -219,7 +220,7 @@ Menu principal (entree du jeu) :
     - `Euros / sec` + total euros
     - `Colis / sec` + total colis
     - `Equipe` + employees/capacity
-    - `Cadence` + tick duration + next warehouse cost
+    - `Cadence` + tick duration + next warehouse package objective
 
 Example spirit:
 
@@ -254,7 +255,14 @@ Example spirit:
 
 Each hotspot/list entry must contain (default visible): - Icon - Title - Current level
 
-Each hotspot/list entry must also expose: - Functional description sentence of the upgrade (what it does in gameplay terms) - Current/next effect - Cost - Availability feedback (blocked reason or buy action)
+Each hotspot/list entry must also expose: - Functional description sentence of the upgrade (what it does in gameplay terms) - Current/next effect - Cost - Availability feedback (blocked reason, unlock action, or buy action)
+
+Run unlock rule:
+- `Employees` is always available
+- `Scanners`, `Conveyors`, `Carts`, and `Trucks` start each run locked
+- a locked row must display a one-time run unlock cost
+- once unlocked, the row switches back to normal purchase mode for the rest of the run
+- after warehouse reset / relocation, non-employee upgrades lock again
 
 ## Behavior
 

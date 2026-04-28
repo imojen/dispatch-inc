@@ -31,6 +31,7 @@ export interface UpgradeBalanceDto {
   maxLevel?: number
   costScaleId: string
   effectScaleId: string
+  unlockCostScaleId?: string
 }
 
 export interface BalanceCatalogDto {

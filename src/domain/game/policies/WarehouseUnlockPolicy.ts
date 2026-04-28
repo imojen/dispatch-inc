@@ -1,5 +1,8 @@
-export function canUnlockNextWarehouse(currentMoney: number, requiredCost: number): boolean {
-  return currentMoney >= requiredCost
+export function canUnlockNextWarehouse(
+  currentPackages: number,
+  requiredPackages: number,
+): boolean {
+  return currentPackages >= requiredPackages
 }
 
 export function canHireEmployee(

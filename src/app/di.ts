@@ -7,6 +7,7 @@ import type { PurchaseUpgrade } from '@/application/useCases/purchaseUpgrade'
 import type { RunTick } from '@/application/useCases/runTick'
 import type { TriggerWarehouseReset } from '@/application/useCases/triggerWarehouseReset'
 import type { UnlockSkill } from '@/application/useCases/unlockSkill'
+import type { UnlockUpgrade } from '@/application/useCases/unlockUpgrade'
 import type { AutosaveActiveSlot } from '@/application/useCases/autosaveActiveSlot'
 import type { CreateNewSave } from '@/application/useCases/createNewSave'
 import type { DeleteSave } from '@/application/useCases/deleteSave'
@@ -18,6 +19,7 @@ import { createPurchaseUpgradeUseCase } from '@/application/useCases/purchaseUpg
 import { createRunTickUseCase } from '@/application/useCases/runTick'
 import { createTriggerWarehouseResetUseCase } from '@/application/useCases/triggerWarehouseReset'
 import { createUnlockSkillUseCase } from '@/application/useCases/unlockSkill'
+import { createUnlockUpgradeUseCase } from '@/application/useCases/unlockUpgrade'
 import type { ImportSave } from '@/application/useCases/importSave'
 import type { LoadSave } from '@/application/useCases/loadSave'
 import { createAutosaveActiveSlotUseCase } from '@/application/useCases/autosaveActiveSlot'
@@ -55,6 +57,7 @@ export interface AppUseCaseFactories {
   createRunTick: () => RunTick
   createApplyOfflineProgress: () => ApplyOfflineProgress
   createPurchaseUpgrade: () => PurchaseUpgrade
+  createUnlockUpgrade: () => UnlockUpgrade
   createUnlockSkill: () => UnlockSkill
   createTriggerWarehouseReset: () => TriggerWarehouseReset
   createGetUiTextBundle: () => (
@@ -90,6 +93,8 @@ export function createUseCaseFactories(ports: AppPorts): AppUseCaseFactories {
       createApplyOfflineProgressUseCase(ports.balanceCatalogRepository, ports.clock),
     createPurchaseUpgrade: () =>
       createPurchaseUpgradeUseCase(ports.balanceCatalogRepository),
+    createUnlockUpgrade: () =>
+      createUnlockUpgradeUseCase(ports.balanceCatalogRepository),
     createUnlockSkill: () =>
       createUnlockSkillUseCase(ports.balanceCatalogRepository),
     createTriggerWarehouseReset: () =>
