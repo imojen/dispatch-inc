@@ -61,8 +61,8 @@ describe('game view model runtime snapshot', () => {
     )
 
     expect(snapshot.upgrades.employees.baseCurrentEffect).toBe(2)
-    expect(snapshot.upgrades.employees.currentEffect).toBe(3)
-    expect(snapshot.upgrades.employees.nextEffect).toBe(4)
+    expect(snapshot.upgrades.employees.currentEffect).toBe(4)
+    expect(snapshot.upgrades.employees.nextEffect).toBe(8)
     expect(snapshot.upgrades.scanners.currentEffect).toBeGreaterThan(
       snapshot.upgrades.scanners.baseCurrentEffect,
     )

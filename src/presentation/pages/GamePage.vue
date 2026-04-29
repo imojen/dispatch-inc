@@ -58,13 +58,15 @@
                         {{ game.current.progression.warehouseLevel }}
                       </h1>
                       <p class="terminal-title-subline">
-                        {{ t("game.header.nextWarehouseMoveCost") }}:
-                        {{ formatWholeCompact(nextWarehousePackagesRequired) }}
-                        {{ t("game.stats.packages") }}
-                        [
-                        {{ warehouseGoalProgressBar }}
-                        ]
-                        {{ warehouseGoalProgressPercent }}%
+                        <span class="terminal-title-subline-goal">
+                          {{ t("game.header.nextWarehouseMoveCost") }}:
+                          {{ formatWholeCompact(nextWarehousePackagesRequired) }}
+                          {{ t("game.stats.packages") }}
+                        </span>
+                        <span class="terminal-title-subline-progress">
+                          [ {{ warehouseGoalProgressBar }} ]
+                          {{ warehouseGoalProgressPercent }}%
+                        </span>
                         <span class="terminal-cursor" aria-hidden="true"
                           >_</span
                         >
@@ -1285,7 +1287,12 @@ function formatPercent(value: number): string {
 }
 
 function formatSkillEffect(value: number): string {
-  return `x${Math.round(value * 100) / 100}`;
+  if (!Number.isFinite(value) || value <= 1) {
+    return "+0%";
+  }
+
+  const gainPercent = Math.round((value - 1) * 100);
+  return `+${gainPercent}%`;
 }
 
 function formatHours(value: number): string {

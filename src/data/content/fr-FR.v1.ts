@@ -14,7 +14,7 @@ export const frFrTextCatalogV1: UiTextCatalogDto = {
       "Gerez vos sauvegardes locales et relancez votre centre de tri.",
     "home.kicker": "Centre de commandement logistique",
     "home.terminal.brand": "DISPATCH INC. // CORP TRY #0",
-    "home.terminal.help": "[about]",
+    "home.terminal.help": "[a propos]",
     "home.terminal.stats": "[Imojen]",
     "home.terminal.options": "[Github]",
     "home.terminal.systemOk": "SYSTEME: OK",
@@ -35,6 +35,15 @@ export const frFrTextCatalogV1: UiTextCatalogDto = {
     "home.newRun.label": "Nom de la partie",
     "home.newRun.placeholder": "Dispatch Inc - Corp try # <n>",
     "home.newRun.confirm": "Lancer",
+    "home.about.title": "A propos de Dispatch Inc.",
+    "home.about.intro":
+      "Dispatch Inc. est un jeu de gestion idle dans lequel vous incarnez le superviseur d'un hub logistique en pleine croissance.",
+    "home.about.goal":
+      "Votre mission est simple: investir vos euros dans la chaine de production pour traiter toujours plus de colis.",
+    "home.about.progression":
+      "Quand l'objectif de colis d'un entrepot est atteint, vous demenagez vers un hub plus grand, vous repartez de zero, et vous gagnez un point de competence permanent.",
+    "home.about.absence":
+      "Quand vous quittez votre poste, l'entrepot continue de tourner sans supervision, mais l'equipe perd en rigueur. A vous de construire une operation capable de performer meme en votre absence.",
     "home.load.title": "Sauvegardes locales",
     "home.load.subtitle":
       "Selectionnez une run locale et reprenez instantanement.",
@@ -222,13 +231,13 @@ export const frFrTextCatalogV1: UiTextCatalogDto = {
     "game.skills.state.maxed": "Niveau maximal atteint.",
     "game.skills.state.hiddenLocked":
       "Branche cachee verrouillee (35/35 requis).",
-    "game.skills.effect.staff": "Multiplicateur efficacite personnel",
-    "game.skills.effect.scan": "Multiplicateur performance scan",
-    "game.skills.effect.conveyor": "Multiplicateur cadence transport",
-    "game.skills.effect.sorting": "Multiplicateur production tri",
-    "game.skills.effect.shipping": "Multiplicateur revenus expedition",
-    "game.skills.effect.warehouse": "Multiplicateur capacite entrepot",
-    "game.skills.effect.cheat": "Multiplicateur optimisation",
+    "game.skills.effect.staff": "Bonus efficacite personnel",
+    "game.skills.effect.scan": "Bonus performance scan",
+    "game.skills.effect.conveyor": "Bonus cadence transport",
+    "game.skills.effect.sorting": "Bonus production tri",
+    "game.skills.effect.shipping": "Bonus revenus expedition",
+    "game.skills.effect.warehouse": "Bonus capacite entrepot",
+    "game.skills.effect.cheat": "Bonus optimisation",
     "game.skills.effect.offline.efficiency": "Rendement sans supervision",
     "game.skills.effect.offline.duration": "Absence max couverte (h)",
     "game.skills.branch.staff.title": "Gestion du personnel",

@@ -2974,6 +2974,33 @@ select {
   font-size: 0.98rem;
 }
 
+.terminal-function-link {
+  margin: 0;
+  padding: 0;
+  border: 0 !important;
+  background: transparent !important;
+  color: inherit !important;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: none !important;
+  appearance: none;
+}
+
+.terminal-function-link::before,
+.terminal-function-link::after {
+  content: none !important;
+}
+
+.terminal-function-link:hover,
+.terminal-function-link:focus-visible {
+  color: #8fffaf !important;
+  text-shadow: 0 0 8px rgba(60, 255, 122, 0.25);
+  outline: none;
+}
+
 .home-terminal-hero {
   width: min(660px, 100%);
   margin: 0 auto;
@@ -3306,6 +3333,24 @@ select {
 .home-terminal-modal .message-error {
   color: #ff5f3c !important;
   border-color: rgba(255, 95, 60, 0.5) !important;
+}
+
+.home-about-modal {
+  width: min(640px, calc(100vw - 2rem));
+}
+
+.home-about-copy {
+  display: grid;
+  gap: 1rem;
+  padding-top: 0.4rem;
+}
+
+.home-about-copy p {
+  margin: 0;
+  color: #8fffaf;
+  font-size: 0.98rem;
+  line-height: 1.65;
+  letter-spacing: 0.04em;
 }
 
 .home-terminal-modal .slot-list {

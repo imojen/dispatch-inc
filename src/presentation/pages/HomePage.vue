@@ -5,9 +5,29 @@
         <div class="terminal-frame-line">
           <span>{{ t('home.terminal.brand') }}</span>
           <nav class="terminal-function-bar">
-            <span>{{ t('home.terminal.help') }}</span>
-            <span>{{ t('home.terminal.stats') }}</span>
-            <span>{{ t('home.terminal.options') }}</span>
+            <button
+              class="terminal-function-link"
+              type="button"
+              @click="openAboutModal"
+            >
+              {{ t('home.terminal.help') }}
+            </button>
+            <a
+              class="terminal-function-link"
+              href="https://github.com/imojen"
+              target="_blank"
+              rel="noreferrer"
+            >
+              {{ t('home.terminal.stats') }}
+            </a>
+            <a
+              class="terminal-function-link"
+              href="https://github.com/imojen/dispatch-inc"
+              target="_blank"
+              rel="noreferrer"
+            >
+              {{ t('home.terminal.options') }}
+            </a>
           </nav>
         </div>
       </header>
@@ -82,6 +102,37 @@
           </div>
         </div>
       </footer>
+    </section>
+
+    <section
+      v-if="isAboutModalOpen"
+      class="overlay"
+    >
+      <article class="overlay-card home-terminal-modal home-about-modal">
+        <header class="panel-header panel-header-popup">
+          <h2 class="popup-title">
+            {{ t('home.about.title') }}
+          </h2>
+          <button
+            class="button button-ghost button-icon"
+            :aria-label="t('common.close')"
+            :title="t('common.close')"
+            @click="closeAboutModal"
+          >
+            <i
+              class="fa-solid fa-xmark"
+              aria-hidden="true"
+            />
+          </button>
+        </header>
+
+        <div class="home-about-copy">
+          <p>{{ t('home.about.intro') }}</p>
+          <p>{{ t('home.about.goal') }}</p>
+          <p>{{ t('home.about.progression') }}</p>
+          <p>{{ t('home.about.absence') }}</p>
+        </div>
+      </article>
     </section>
 
     <section
@@ -253,6 +304,7 @@ import { useUiStore } from '@/presentation/stores/uiStore'
 
 const saveMenu = useSaveMenuStore()
 const ui = useUiStore()
+const isAboutModalOpen = ref(false)
 const isCreateModalOpen = ref(false)
 const newRunLabel = ref('')
 
@@ -277,6 +329,14 @@ function slotClass(slotId: string): string {
   }
 
   return ''
+}
+
+function openAboutModal(): void {
+  isAboutModalOpen.value = true
+}
+
+function closeAboutModal(): void {
+  isAboutModalOpen.value = false
 }
 
 function buildDefaultRunLabel(): string {

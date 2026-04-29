@@ -293,54 +293,54 @@ function buildPleasantCandidateCatalog(): BalanceCatalogDto {
 
   setPiecewiseBases(catalog, "skills.staff.effect.v1", [
     "1",
-    "1.16",
-    "1.32",
     "1.5",
-    "1.7",
-    "1.92",
+    "2.25",
+    "3.38",
+    "5.07",
+    "7.6",
   ]);
   setPiecewiseBases(catalog, "skills.scan.effect.v1", [
     "1",
-    "1.15",
-    "1.32",
     "1.5",
-    "1.7",
-    "1.92",
+    "2.25",
+    "3.38",
+    "5.07",
+    "7.6",
   ]);
   setPiecewiseBases(catalog, "skills.conveyor.effect.v1", [
     "1",
-    "1.12",
-    "1.27",
-    "1.44",
-    "1.63",
-    "1.84",
+    "1.5",
+    "2.25",
+    "3.38",
+    "5.07",
+    "7.6",
   ]);
   setPiecewiseBases(catalog, "skills.sorting.effect.v1", [
     "1",
-    "1.11",
-    "1.24",
-    "1.39",
-    "1.56",
-    "1.75",
+    "1.5",
+    "2.25",
+    "3.38",
+    "5.07",
+    "7.6",
   ]);
   setPiecewiseBases(catalog, "skills.shipping.effect.v1", [
     "1",
-    "1.11",
-    "1.24",
-    "1.39",
-    "1.56",
-    "1.75",
+    "1.5",
+    "2.25",
+    "3.38",
+    "5.07",
+    "7.6",
   ]);
   setPiecewiseBases(catalog, "skills.warehouse.effect.v1", [
     "1",
-    "1.08",
-    "1.18",
-    "1.29",
-    "1.41",
-    "1.54",
+    "1.5",
+    "2.25",
+    "3.38",
+    "5.07",
+    "7.6",
   ]);
 
-  setWarehouseRequirements(catalog, [1200, 3000, 6000, 10500, 16500, 23500, 32000, 41000]);
+  setWarehouseRequirements(catalog, [3000, 9000, 20000, 36000, 58000, 86000, 121000, 163000]);
 
   return catalog;
 }
